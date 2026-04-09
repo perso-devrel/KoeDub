@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { db, migrate } from '../../_lib/db';
-import { verifyFirebaseToken } from '../../_lib/auth';
+import { db, migrate } from '../../_lib/db.js';
+import { verifyFirebaseToken } from '../../_lib/auth.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
