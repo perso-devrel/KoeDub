@@ -130,10 +130,18 @@ export async function getSpace(spaceSeq: number): Promise<PersoSpaceBanner> {
 }
 
 export async function getSasToken(fileName: string) {
+  // 문서: GET /file/api/upload/sas-token?fileName={URL-encoded}
+  // 응답: { blobSasUrl, expirationDatetime } (result 래핑이 있을 수도 없을 수도 있음)
   const { data } = await api.get('/file/api/upload/sas-token', {
     params: { fileName },
   });
-  return data as { blobSasUrl: string; expirationDatetime: string };
+  const payload = (data?.result ?? data) as { blobSasUrl: string; expirationDatetime: string };
+  if (!payload?.blobSasUrl) {
+    throw new Error(
+      `SAS 토큰 발급 실패: 응답에 blobSasUrl이 없습니다. 응답: ${JSON.stringify(data).slice(0, 200)}`
+    );
+  }
+  return payload;
 }
 
 export async function uploadToAzure(blobSasUrl: string, file: File) {
@@ -155,7 +163,7 @@ export async function registerVideo(
     fileUrl,
     fileName,
   });
-  return data;
+  return (data?.result ?? data) as PersoUploadedFile;
 }
 
 export async function uploadVideoFile(

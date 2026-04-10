@@ -23,8 +23,9 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false,
           rewrite: (path: string) => path.replace(/^\/api\/perso/, ''),
-          configure: (proxy) => {
-            proxy.on('proxyReq', (proxyReq, req) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          configure: (proxy: any) => {
+            proxy.on('proxyReq', (proxyReq: any, req: any) => {
               if (persoApiKey) {
                 proxyReq.setHeader('XP-API-KEY', persoApiKey);
               }
@@ -32,10 +33,10 @@ export default defineConfig(({ mode }) => {
               proxyReq.removeHeader('referer');
               console.log(`[proxy] ${req.method} ${req.url} → ${persoApiTarget}${proxyReq.path}`);
             });
-            proxy.on('proxyRes', (proxyRes, req) => {
+            proxy.on('proxyRes', (proxyRes: any, req: any) => {
               console.log(`[proxy] ${proxyRes.statusCode} ← ${req.method} ${req.url}`);
             });
-            proxy.on('error', (err, req) => {
+            proxy.on('error', (err: any, req: any) => {
               console.error(`[proxy] ERROR ${req.method} ${req.url}:`, err.message);
             });
           },
@@ -49,8 +50,9 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false,
           rewrite: (path: string) => path.replace(/^\/api\/perso/, ''),
-          configure: (proxy) => {
-            proxy.on('proxyReq', (proxyReq) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          configure: (proxy: any) => {
+            proxy.on('proxyReq', (proxyReq: any) => {
               if (persoApiKey) {
                 proxyReq.setHeader('XP-API-KEY', persoApiKey);
               }
