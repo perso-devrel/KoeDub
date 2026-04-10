@@ -128,7 +128,7 @@ export default function PricingPage() {
     }
     setModal({
       type: 'credit',
-      label: `${pkg.label} 더빙 시간`,
+      label: t('pricing.dubbingTimeLabel', { amount: pkg.label }),
       price: pkg.price,
       seconds: pkg.seconds,
     });
@@ -148,7 +148,7 @@ export default function PricingPage() {
       } else if (modal.type === 'credit' && modal.seconds) {
         const result = await purchaseCredits({
           seconds: modal.seconds,
-          description: `${modal.label} 충전`,
+          description: t('pricing.creditRecharge', { amount: modal.label }),
         });
         useAuthStore.getState().setCreditSeconds(result.creditSeconds);
       }
@@ -182,7 +182,7 @@ export default function PricingPage() {
           </p>
           {user && (
             <p className="mt-4 text-sm text-gray-500">
-              현재 잔여 시간: <span className="text-primary-400 font-medium">{formatSeconds(user.creditSeconds)}</span>
+              {t('pricing.remainingTime')} <span className="text-primary-400 font-medium">{formatSeconds(user.creditSeconds)}</span>
             </p>
           )}
         </div>

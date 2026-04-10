@@ -183,6 +183,8 @@ export default {
     billingCreditPack: '크레딧 패키지 구매',
     selectLanguage: '인터페이스 언어를 선택하세요',
     languageHint: '모든 메뉴와 텍스트가 선택한 언어로 표시됩니다',
+    langKoreanSub: 'Korean',
+    langEnglishSub: '영어',
   },
   pricing: {
     title: '요금제',
@@ -238,6 +240,9 @@ export default {
     timePack10: '10분',
     timePack50: '50분',
     timePack100: '100분',
+    dubbingTimeLabel: '{{amount}} 더빙 시간',
+    creditRecharge: '{{amount}} 충전',
+    remainingTime: '현재 잔여 시간:',
     // Nested plan objects for LandingPage pricing section
     'free.name': 'Free',
     'free.price': '$0',

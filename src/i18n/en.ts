@@ -183,6 +183,8 @@ export default {
     billingCreditPack: 'Credit pack purchase',
     selectLanguage: 'Select interface language',
     languageHint: 'All menus and text will be displayed in the selected language',
+    langKoreanSub: 'Korean',
+    langEnglishSub: 'English',
   },
   pricing: {
     title: 'Pricing',
@@ -238,6 +240,9 @@ export default {
     timePack10: '10 min',
     timePack50: '50 min',
     timePack100: '100 min',
+    dubbingTimeLabel: '{{amount}} dubbing time',
+    creditRecharge: '{{amount}} recharge',
+    remainingTime: 'Remaining time:',
     // Nested plan objects for LandingPage pricing section
     'free.name': 'Free',
     'free.price': '$0',
