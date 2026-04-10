@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { getLibraryItem, formatSeconds, type LibraryItemDetail } from '../services/anivoiceApi';
 import { resolvePersoFileUrl } from '../services/persoApi';
 
 export default function LibraryDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation();
+  usePageTitle('pageTitle.libraryDetail');
   const [item, setItem] = useState<LibraryItemDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);

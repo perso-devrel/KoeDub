@@ -317,6 +317,17 @@ export default {
     privacy: '개인정보처리방침',
     dmca: 'DMCA',
   },
+  pageTitle: {
+    landing: '홈',
+    auth: '로그인',
+    dashboard: '대시보드',
+    studio: '더빙 작업실',
+    library: '라이브러리',
+    libraryDetail: '작품 상세',
+    pricing: '요금제',
+    settings: '설정',
+    test: '개발자 도구',
+  },
   errorBoundary: {
     title: '문제가 발생했습니다',
     description: '예상치 못한 오류가 발생했습니다. 페이지를 새로고침한 후 다시 시도해주세요.',

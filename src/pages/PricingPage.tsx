@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { purchaseCredits, formatSeconds } from '../services/anivoiceApi';
@@ -29,6 +30,7 @@ interface ModalState {
 
 export default function PricingPage() {
   const { t } = useTranslation();
+  usePageTitle('pageTitle.pricing');
   const navigate = useNavigate();
   const { user } = useAuthStore();
 

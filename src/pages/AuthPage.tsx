@@ -1,6 +1,7 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { signInWithGoogle, signInWithEmail, signUpWithEmail } from '../services/firebase';
 import { useAuthStore } from '../stores/authStore';
 import { showToast } from '../stores/toastStore';
@@ -11,6 +12,7 @@ type Mode = 'login' | 'signup';
 
 export default function AuthPage() {
   const { t } = useTranslation();
+  usePageTitle('pageTitle.auth');
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuthStore();
