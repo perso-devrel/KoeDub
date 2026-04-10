@@ -24,7 +24,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       await db.execute({
         sql: `INSERT INTO credit_transactions (user_id, type, amount_seconds, balance_after, description)
               VALUES (?, 'plan_grant', ?, ?, ?)`,
-        args: [token.sub, newCredits, newCredits, `플랜 변경: ${plan}`],
+        args: [token.sub, newCredits, newCredits, `Plan change: ${plan}`],
       });
 
       return res.json({ plan, creditSeconds: newCredits });
@@ -46,7 +46,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       await db.execute({
         sql: `INSERT INTO credit_transactions (user_id, type, amount_seconds, balance_after, description)
               VALUES (?, 'purchase', ?, ?, ?)`,
-        args: [token.sub, seconds, balanceAfter, description || `${seconds}초 구매`],
+        args: [token.sub, seconds, balanceAfter, description || `Purchased ${seconds}s`],
       });
 
       return res.json({ creditSeconds: balanceAfter, added: seconds });
