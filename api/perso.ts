@@ -7,7 +7,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (!apiKey) {
     return res.status(500).json({
-      error: 'XP_API_KEY 환경변수가 설정되지 않았습니다. Vercel 환경변수 또는 .env 를 확인하세요.',
+      error: 'XP_API_KEY is not configured. Check Vercel environment variables or .env file.',
     });
   }
 
@@ -37,7 +37,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     return res.status(502).json({
-      error: `Perso API 프록시 요청 실패: ${message}`,
+      error: `Perso API proxy request failed: ${message}`,
       target: targetUrl,
     });
   }

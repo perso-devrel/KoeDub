@@ -22,7 +22,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     if (result.rowsAffected === 0) {
-      return res.status(402).json({ error: '잔여 시간이 부족합니다.' });
+      return res.status(402).json({ error: 'Insufficient credit balance.' });
     }
 
     // Get new balance
@@ -36,7 +36,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     await db.execute({
       sql: `INSERT INTO credit_transactions (user_id, type, amount_seconds, balance_after, description, project_id)
             VALUES (?, 'dubbing_deduct', ?, ?, ?, ?)`,
-      args: [token.sub, -seconds, balanceAfter, `더빙 사용: ${seconds}초`, projectId || null],
+      args: [token.sub, -seconds, balanceAfter, `Dubbing usage: ${seconds}s`, projectId || null],
     });
 
     return res.json({ remainingSeconds: balanceAfter, deducted: seconds });
