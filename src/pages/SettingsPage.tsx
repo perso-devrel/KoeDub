@@ -292,7 +292,7 @@ export default function SettingsPage() {
                 <span className="text-2xl">🇰🇷</span>
                 <div className="text-left">
                   <p className="text-white font-medium">한국어</p>
-                  <p className="text-sm text-gray-400">Korean</p>
+                  <p className="text-sm text-gray-400">{t('settings.langKoreanSub')}</p>
                 </div>
                 {language === 'ko' && (
                   <svg
@@ -323,7 +323,7 @@ export default function SettingsPage() {
                 <span className="text-2xl">🇺🇸</span>
                 <div className="text-left">
                   <p className="text-white font-medium">English</p>
-                  <p className="text-sm text-gray-400">영어</p>
+                  <p className="text-sm text-gray-400">{t('settings.langEnglishSub')}</p>
                 </div>
                 {language === 'en' && (
                   <svg
