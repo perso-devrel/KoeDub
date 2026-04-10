@@ -89,6 +89,9 @@ export default {
     allLanguages: 'All languages',
     sortNewest: 'Newest',
     sortOldest: 'Oldest',
+    usageChart: 'Usage — Last 30 days',
+    usageSeconds: 'Seconds used',
+    noUsageData: 'No usage data yet',
   },
   studio: {
     uploadTitle: 'Upload Video',
