@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { useSearchParams } from 'react-router-dom';
 import {
   listSpaces,
@@ -78,6 +79,7 @@ function SpinnerIcon({ className = 'w-5 h-5' }: { className?: string }) {
 
 export default function StudioPage() {
   const { t } = useTranslation();
+  usePageTitle('pageTitle.studio');
 
   const [searchParams] = useSearchParams();
 

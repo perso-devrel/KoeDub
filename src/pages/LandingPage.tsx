@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const LANGUAGES = [
   { key: 'ja', flag: '🇯🇵' },
@@ -247,6 +248,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 
 export default function LandingPage() {
   const { t } = useTranslation();
+  usePageTitle('pageTitle.landing');
 
   const features = [
     { icon: <IconVoice />, titleKey: 'landing.featureVoice', descKey: 'landing.featureVoiceDesc' },

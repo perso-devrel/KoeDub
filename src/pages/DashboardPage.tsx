@@ -1,6 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { listMyProjects, toggleFavorite, formatSeconds, getCreditHistory, type DbProject, type CreditHistoryDay } from '../services/anivoiceApi';
 
 const UsageChart = lazy(() => import('../components/UsageChart'));
@@ -61,6 +62,7 @@ const GRADIENT_PLACEHOLDERS = [
 
 export default function DashboardPage() {
   const { t } = useTranslation();
+  usePageTitle('pageTitle.dashboard');
   const user = useAuthStore((s) => s.user);
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
   const [searchQuery, setSearchQuery] = useState('');

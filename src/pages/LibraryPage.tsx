@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { getLibrary, getTags, formatSeconds, type LibraryItem, type Tag } from '../services/anivoiceApi';
 import { resolvePersoFileUrl } from '../services/persoApi';
 
@@ -49,6 +50,7 @@ function ClockIcon() {
 
 export default function LibraryPage() {
   const { t } = useTranslation();
+  usePageTitle('pageTitle.library');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTag, setActiveTag] = useState('all');
   const [sortMode, setSortMode] = useState<'popular' | 'latest'>('popular');
