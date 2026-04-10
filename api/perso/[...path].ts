@@ -7,12 +7,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const apiKey = process.env.XP_API_KEY;
 
   // Build query string from remaining params (excluding 'path')
-  const qs = new URLSearchParams();
+  // Vercel already decodes query params, so we pass them as-is
+  const parts: string[] = [];
   for (const [key, value] of Object.entries(queryParams)) {
     const v = Array.isArray(value) ? value[0] : value;
-    if (v) qs.append(key, v);
+    if (v != null && v !== '') parts.push(`${encodeURIComponent(key)}=${encodeURIComponent(v)}`);
   }
-  const qsStr = qs.toString();
+  const qsStr = parts.join('&');
   const fullUrl = qsStr ? `${baseUrl}/${persoPath}?${qsStr}` : `${baseUrl}/${persoPath}`;
 
   const headers: Record<string, string> = {};
@@ -36,16 +37,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
+    console.log(`[perso-proxy] ${req.method} ${fullUrl}`);
     const response = await fetch(fullUrl, fetchOptions);
     const data = await response.text();
 
+    // Forward all response headers
     res.status(response.status);
     const contentType = response.headers.get('content-type');
     if (contentType) {
       res.setHeader('Content-Type', contentType);
     }
+    if (!response.ok) {
+      console.error(`[perso-proxy] ${response.status} ${data.slice(0, 300)}`);
+    }
     res.send(data);
   } catch (e) {
+    console.error(`[perso-proxy] ERROR:`, e);
     res.status(502).json({ error: e instanceof Error ? e.message : 'Proxy error' });
   }
 }

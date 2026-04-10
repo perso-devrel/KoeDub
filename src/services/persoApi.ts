@@ -130,13 +130,14 @@ export async function getSpace(spaceSeq: number): Promise<PersoSpaceBanner> {
 }
 
 export async function getSasToken(fileName: string) {
+  // 문서: GET /file/api/upload/sas-token?fileName={URL-encoded}
+  // 응답: { blobSasUrl, expirationDatetime } (result 래핑 없음)
   const { data } = await api.get('/file/api/upload/sas-token', {
     params: { fileName },
   });
-  // API may wrap in { result: ... } or return directly
   const payload = (data?.result ?? data) as { blobSasUrl: string; expirationDatetime: string };
   if (!payload?.blobSasUrl) {
-    throw new Error('SAS 토큰 발급 실패: blobSasUrl이 비어있습니다.');
+    throw new Error(`SAS 토큰 발급 실패: 응답에 blobSasUrl이 없습니다. 응답: ${JSON.stringify(data).slice(0, 200)}`);
   }
   return payload;
 }
