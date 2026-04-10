@@ -317,6 +317,17 @@ export default {
     privacy: 'Privacy Policy',
     dmca: 'DMCA',
   },
+  pageTitle: {
+    landing: 'Home',
+    auth: 'Log in',
+    dashboard: 'Dashboard',
+    studio: 'Dubbing Studio',
+    library: 'Library',
+    libraryDetail: 'Project Detail',
+    pricing: 'Pricing',
+    settings: 'Settings',
+    test: 'Dev Tools',
+  },
   errorBoundary: {
     title: 'Something went wrong',
     description: 'An unexpected error occurred. Please reload the page and try again.',

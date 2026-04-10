@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUIStore } from '../stores/uiStore';
 import { useAuthStore } from '../stores/authStore';
@@ -10,6 +11,7 @@ type Tab = 'profile' | 'subscription' | 'billing' | 'language';
 
 export default function SettingsPage() {
   const { t, i18n } = useTranslation();
+  usePageTitle('pageTitle.settings');
   const { language, setLanguage } = useUIStore();
   const { user } = useAuthStore();
   const navigate = useNavigate();

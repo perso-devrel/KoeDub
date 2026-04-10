@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import axios from 'axios';
 import * as api from '../services/persoApi';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const BASE = (import.meta.env.VITE_PERSO_PROXY_PATH || '/api/perso').replace(/\/+$/, '');
 
@@ -185,6 +186,7 @@ function Section({ title, description, num, children }: {
 // ── Main Component ──
 
 export default function TestPage() {
+  usePageTitle('pageTitle.test');
   const [spaceSeq, setSpaceSeq] = useState<number | null>(null);
   const [mediaSeq, setMediaSeq] = useState<number | null>(null);
   const [projectSeq, setProjectSeq] = useState<number | null>(null);
