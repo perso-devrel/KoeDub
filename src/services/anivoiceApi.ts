@@ -140,6 +140,17 @@ export async function purchaseCredits(params: { seconds?: number; plan?: string;
   return data;
 }
 
+export interface CreditHistoryDay {
+  day: string;
+  usedSeconds: number;
+  txCount: number;
+}
+
+export async function getCreditHistory(days = 30): Promise<{ days: number; data: CreditHistoryDay[] }> {
+  const { data } = await api.get('/credits/history', { params: { days } });
+  return data;
+}
+
 // ── Library (public, no auth) ──
 
 export interface LibraryItem {
