@@ -89,6 +89,9 @@ export default {
     allLanguages: '전체 언어',
     sortNewest: '최신순',
     sortOldest: '오래된순',
+    usageChart: '최근 30일 사용량',
+    usageSeconds: '사용 시간(초)',
+    noUsageData: '아직 사용 기록이 없습니다',
   },
   studio: {
     uploadTitle: '영상 업로드',
