@@ -45,6 +45,8 @@ const PLAN_KEYS = [
   { nameKey: 'pricing.payPerUse.name', priceKey: 'pricing.payPerUse.price', featuresKey: 'pricing.payPerUse.features', highlight: false },
 ];
 
+const SECTION_HEADING_CLASS = "text-3xl md:text-4xl font-bold text-center gradient-text";
+
 const WAVEFORM_ORIGINAL = [3, 5, 2, 6, 4, 7, 3, 5, 2, 4, 6, 3, 5, 7, 4];
 const WAVEFORM_DUBBED = [4, 6, 3, 7, 5, 2, 6, 4, 7, 3, 5, 2, 6, 4, 5];
 const WAVEFORM_HEIGHT_MULTIPLIER = 3;
@@ -291,7 +293,7 @@ export default function LandingPage() {
         {/*  HOW IT WORKS                                                */}
         {/* ============================================================ */}
         <section className="px-4 py-20 md:py-28 max-w-5xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 gradient-text">
+          <h2 className={`${SECTION_HEADING_CLASS} mb-4`}>
             {t('landing.howItWorks')}
           </h2>
           <p className="text-gray-400 text-center mb-16 max-w-lg mx-auto">
@@ -315,7 +317,7 @@ export default function LandingPage() {
         {/*  SUPPORTED LANGUAGES                                         */}
         {/* ============================================================ */}
         <section className="px-4 py-20 md:py-28 max-w-5xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-14 gradient-text">
+          <h2 className={`${SECTION_HEADING_CLASS} mb-14`}>
             {t('landing.supportedLangs')}
           </h2>
           <div className="flex flex-wrap justify-center gap-6 md:gap-10">
@@ -337,7 +339,7 @@ export default function LandingPage() {
         {/*  PRICING                                                     */}
         {/* ============================================================ */}
         <section className="px-4 py-20 md:py-28 max-w-6xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 gradient-text">
+          <h2 className={`${SECTION_HEADING_CLASS} mb-4`}>
             {t('pricing.title')}
           </h2>
           <p className="text-gray-400 text-center mb-14 max-w-lg mx-auto">
@@ -362,7 +364,7 @@ export default function LandingPage() {
         {/*  FAQ                                                         */}
         {/* ============================================================ */}
         <section className="px-4 py-20 md:py-28 max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-14 gradient-text">
+          <h2 className={`${SECTION_HEADING_CLASS} mb-14`}>
             {t('landing.faq')}
           </h2>
           <div className="glass rounded-2xl p-6 md:p-8">
