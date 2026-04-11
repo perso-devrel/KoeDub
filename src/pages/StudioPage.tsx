@@ -21,7 +21,7 @@ import { createProject, updateProject, deductCredits, getTags, publishProject } 
 import { useAuthStore } from '../stores/authStore';
 import type { Tag } from '../services/anivoiceApi';
 import type { PersoProgress, PersoScriptSentence, PersoDownloadLinks } from '../types';
-import { formatMs } from '../utils/format';
+import { formatMs, getErrorMessage } from '../utils/format';
 import { getDownloadUrl, computeDubbingProgress, buildShareUrl } from '../utils/studio';
 import { FileIcon, PlayIcon, DownloadIcon, CheckIcon, SpinnerIcon, AlertCircleIcon, LinkIcon } from '../components/icons';
 
@@ -138,7 +138,7 @@ export default function StudioPage() {
         setProcessStage('done');
         setIsProcessing(false);
       } catch (err) {
-        setError(err instanceof Error ? err.message : String(err));
+        setError(getErrorMessage(err));
         setIsProcessing(false);
       } finally {
         setLoadingProject(false);
@@ -327,7 +327,7 @@ export default function StudioPage() {
       setRemainingMinutes(null);
       setIsProcessing(false);
     } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
+      const message = getErrorMessage(err);
       setError(message);
       setRemainingMinutes(null);
       setIsProcessing(false);
@@ -355,7 +355,7 @@ export default function StudioPage() {
         return next;
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(getErrorMessage(err));
     } finally {
       setSavingSentence(null);
     }
@@ -383,7 +383,7 @@ export default function StudioPage() {
       setProcessStage('done');
       setProgress(100);
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(getErrorMessage(err));
       setIsProcessing(false);
     }
   }
@@ -405,7 +405,7 @@ export default function StudioPage() {
       await publishProject(dbProjectId, selectedTags);
       setIsPublished(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(getErrorMessage(err));
     } finally {
       setIsPublishing(false);
     }

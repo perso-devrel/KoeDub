@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatMs, formatSeconds, formatChartDay } from './format';
+import { formatMs, formatSeconds, formatChartDay, getErrorMessage } from './format';
 
 describe('formatMs', () => {
   it('formats zero', () => {
@@ -115,5 +115,31 @@ describe('formatChartDay', () => {
 
   it('handles non-ISO strings', () => {
     expect(formatChartDay('abcdefghij')).toBe('fghij');
+  });
+});
+
+describe('getErrorMessage', () => {
+  it('extracts message from Error instance', () => {
+    expect(getErrorMessage(new Error('something broke'))).toBe('something broke');
+  });
+
+  it('converts string to itself', () => {
+    expect(getErrorMessage('plain string')).toBe('plain string');
+  });
+
+  it('converts number to string', () => {
+    expect(getErrorMessage(404)).toBe('404');
+  });
+
+  it('converts null to string', () => {
+    expect(getErrorMessage(null)).toBe('null');
+  });
+
+  it('converts undefined to string', () => {
+    expect(getErrorMessage(undefined)).toBe('undefined');
+  });
+
+  it('handles Error subclass', () => {
+    expect(getErrorMessage(new TypeError('type error'))).toBe('type error');
   });
 });
