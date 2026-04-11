@@ -147,6 +147,7 @@
 - [x] StudioPage 인라인 SettingsStep 함수를 독립 SettingsStep 컴포넌트로 추출 ← iter-151, #461, PR #462/#463
 - [x] StudioPage 인라인 UploadStep 함수를 독립 UploadStep 컴포넌트로 추출 ← iter-152, #466, PR #467/#468
 - [x] StudioPage 인라인 ResultStep 함수를 독립 ResultStep 컴포넌트로 추출 (609→462줄) ← iter-153, #471, PR #472/#473
+- [x] formatCreditTime 헬퍼 추출로 5개 페이지 중복 formatSeconds 패턴 제거 (378→381 tests) ← iter-154, #476, PR #477/#478
 
 ## 자가 생성 풀
 BACKLOG 가 비면 다음 중 골라 채울 수 있다:
