@@ -313,6 +313,7 @@ export default {
     terms: 'Terms of Service',
     privacy: 'Privacy Policy',
     dmca: 'DMCA',
+    allRights: '© 2026 AniVoice. All rights reserved.',
   },
   pageTitle: {
     landing: 'Home',
