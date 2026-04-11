@@ -1,5 +1,7 @@
+import { getErrorMessage } from './format';
+
 export function mapAuthError(err: unknown, t: (key: string) => string): string {
-  const msg = err instanceof Error ? err.message : String(err);
+  const msg = getErrorMessage(err);
 
   if (msg.includes('auth/wrong-password') || msg.includes('auth/invalid-credential')) {
     return t('auth.errorWrongPassword');
