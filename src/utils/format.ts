@@ -21,3 +21,7 @@ export function formatSeconds(seconds: number, labels: TimeLabels): string {
 export function formatChartDay(day: string): string {
   return day.slice(5);
 }
+
+export function getErrorMessage(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
+}

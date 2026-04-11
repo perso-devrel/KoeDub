@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { listMyProjects, toggleFavorite, getCreditHistory, type DbProject, type CreditHistoryDay } from '../services/anivoiceApi';
-import { formatSeconds } from '../utils/format';
+import { formatSeconds, getErrorMessage } from '../utils/format';
 import { PlusIcon, AlertCircleIcon, CheckCircleIcon, SearchIcon, StarIcon, WalletIcon, RefreshIcon, SortIcon, VideoPlayIcon } from '../components/icons';
 
 const UsageChart = lazy(() => import('../components/UsageChart'));
@@ -91,7 +91,7 @@ export default function DashboardPage() {
         }
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : String(err));
+          setError(getErrorMessage(err));
         }
       } finally {
         if (!cancelled) setLoading(false);
