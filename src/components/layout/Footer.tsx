@@ -52,7 +52,7 @@ export default function Footer() {
             {t('landing.copyright')}
           </p>
           <p className="text-xs text-gray-700 mt-2">
-            &copy; 2026 AniVoice. All rights reserved.
+            {t('footer.allRights')}
           </p>
         </div>
       </div>
