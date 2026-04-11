@@ -4,9 +4,10 @@ import { usePageTitle } from '../hooks/usePageTitle';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUIStore } from '../stores/uiStore';
 import { useAuthStore } from '../stores/authStore';
-import { signOut, updateProfile as updateUserProfile } from '../services/firebase';
+import { signOut } from '../services/firebase';
 import { formatCreditTime } from '../utils/format';
-import { CheckmarkIcon, UserIcon } from '../components/icons';
+import { CheckmarkIcon } from '../components/icons';
+import { ProfileTab } from '../components/ProfileTab';
 
 type Tab = 'profile' | 'subscription' | 'billing' | 'language';
 
@@ -41,23 +42,6 @@ export default function SettingsPage() {
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>('profile');
-
-  const [displayName, setDisplayName] = useState(user?.displayName || 'User');
-  const [saved, setSaved] = useState(false);
-  const [saving, setSaving] = useState(false);
-
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      await updateUserProfile(displayName);
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
-    } catch {
-      // Profile update failed silently — user can retry
-    } finally {
-      setSaving(false);
-    }
-  };
 
   const handleLanguageChange = (lang: 'ko' | 'en') => {
     setLanguage(lang);
@@ -99,60 +83,10 @@ export default function SettingsPage() {
 
         {/* Profile Tab */}
         {activeTab === 'profile' && (
-          <div className="glass rounded-2xl p-6 space-y-6">
-            {/* Avatar */}
-            <div className="flex items-center gap-4">
-              <div className="w-20 h-20 rounded-full bg-surface-700 flex items-center justify-center">
-                <UserIcon className="w-10 h-10 text-gray-500" />
-              </div>
-              <div>
-                <p className="text-white font-medium">
-                  {t('settings.avatarPlaceholder')}
-                </p>
-                <p className="text-sm text-gray-500">
-                  {t('settings.avatarHint')}
-                </p>
-              </div>
-            </div>
-
-            {/* Display Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                {t('settings.displayName')}
-              </label>
-              <input
-                type="text"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-surface-800 border border-surface-700 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500 transition-colors"
-              />
-            </div>
-
-            {/* Email (readonly) */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                {t('settings.email')}
-              </label>
-              <input
-                type="email"
-                value={user?.email || 'user@example.com'}
-                readOnly
-                className="w-full px-4 py-3 rounded-xl bg-surface-850 border border-surface-700 text-gray-400 cursor-not-allowed"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                {t('settings.emailReadonly')}
-              </p>
-            </div>
-
-            {/* Save */}
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="px-6 py-3 rounded-xl gradient-bg text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
-            >
-              {saved ? t('settings.saved') : saving ? t('common.loading') : t('settings.save')}
-            </button>
-          </div>
+          <ProfileTab
+            email={user?.email || 'user@example.com'}
+            initialDisplayName={user?.displayName || 'User'}
+          />
         )}
 
         {/* Subscription Tab */}
