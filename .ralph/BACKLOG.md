@@ -138,6 +138,7 @@
 - [x] PricingPage 인라인 plans/timePackages 배열을 모듈 수준 PLAN_CONFIGS/TIME_PACKAGE_CONFIGS 상수로 추출 ← iter-142, #417, PR #418/#419
 - [x] SettingsPage 인라인 billingHistory/basicFeatures 배열을 모듈 수준 BILLING_HISTORY_ENTRIES/BASIC_FEATURE_KEYS 상수로 추출 ← iter-143, #422, PR #423/#424
 - [x] SettingsPage 언어 버튼 중복 JSX를 LANGUAGE_OPTIONS 상수 + map()으로 교체 ← iter-144, #428, PR #429/#430
+- [x] LandingPage 중복 waveform 렌더링을 WaveformBars 서브컴포넌트로 추출 ← iter-145, #433, PR #434/#435
 
 ## 자가 생성 풀
 BACKLOG 가 비면 다음 중 골라 채울 수 있다:
