@@ -14,6 +14,7 @@ const PROGRESS_STAGE_I18N = [
   { key: 'lip-syncing', i18nKey: 'studio.progressLipSync' },
 ] as const;
 
+const RESULT_CENTER_CLASS = 'max-w-lg mx-auto text-center py-12';
 const RESULT_MUTED_TEXT = 'text-sm text-surface-200/60';
 
 const DOWNLOAD_BUTTONS = [
@@ -101,7 +102,7 @@ export function ResultStep({
 
   if (loadingProject) {
     return (
-      <div className="max-w-lg mx-auto text-center py-12 space-y-4">
+      <div className={`${RESULT_CENTER_CLASS} space-y-4`}>
         <LoadingSpinner className="w-10 h-10 mx-auto border-primary-400" />
         <p className={RESULT_MUTED_TEXT}>{t('studio.loadingProject')}</p>
       </div>
@@ -113,7 +114,7 @@ export function ResultStep({
 
   if (isProcessing) {
     return (
-      <div className="max-w-lg mx-auto space-y-8 text-center py-12">
+      <div className={`${RESULT_CENTER_CLASS} space-y-8`}>
         <h2 className="text-2xl font-bold gradient-text">{t('studio.processing')}</h2>
 
         <div className="w-full bg-surface-800 rounded-full h-2 overflow-hidden">
@@ -148,7 +149,7 @@ export function ResultStep({
 
   if (error) {
     return (
-      <div className="max-w-lg mx-auto text-center py-12 space-y-4">
+      <div className={`${RESULT_CENTER_CLASS} space-y-4`}>
         <div className="w-16 h-16 mx-auto rounded-full bg-red-500/10 flex items-center justify-center">
           <AlertCircleIcon className="w-8 h-8 text-red-400" />
         </div>
