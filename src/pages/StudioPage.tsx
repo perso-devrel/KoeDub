@@ -34,6 +34,14 @@ const SPEAKER_COLORS = ['#f472b6', '#a78bfa', '#38bdf8', '#34d399', '#fbbf24', '
 
 const STEPS: Step[] = ['upload', 'settings', 'result'];
 
+const STAGE_ORDER = ['uploading', 'dubbing', 'lip-syncing', 'done'] as const;
+
+const PROGRESS_STAGE_I18N = [
+  { key: 'uploading', i18nKey: 'studio.progressAnalyzing' },
+  { key: 'dubbing', i18nKey: 'studio.progressDubbing' },
+  { key: 'lip-syncing', i18nKey: 'studio.progressLipSync' },
+] as const;
+
 export default function StudioPage() {
   const { t } = useTranslation();
   usePageTitle('pageTitle.studio');
@@ -593,13 +601,8 @@ export default function StudioPage() {
       );
     }
 
-    const progressLabels = [
-      { key: 'uploading', label: t('studio.progressAnalyzing') },
-      { key: 'dubbing', label: t('studio.progressDubbing') },
-      { key: 'lip-syncing', label: t('studio.progressLipSync') },
-    ];
-    const stageOrder = ['uploading', 'dubbing', 'lip-syncing', 'done'];
-    const currentStageIdx = stageOrder.indexOf(processStage);
+    const progressLabels = PROGRESS_STAGE_I18N.map(({ key, i18nKey }) => ({ key, label: t(i18nKey) }));
+    const currentStageIdx = STAGE_ORDER.indexOf(processStage as typeof STAGE_ORDER[number]);
 
     if (isProcessing) {
       return (
