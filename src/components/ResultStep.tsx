@@ -6,11 +6,12 @@ import { PlayIcon, DownloadIcon, AlertCircleIcon, LoadingSpinner } from './icons
 import { SentenceEditList } from './SentenceEditList';
 import { PublishSection } from './PublishSection';
 
-const STAGE_ORDER = ['uploading', 'dubbing', 'lip-syncing', 'done'] as const;
+const STAGE_ORDER = ['uploading', 'dubbing', 're-dubbing', 'lip-syncing', 'done'] as const;
 
 const PROGRESS_STAGE_I18N = [
   { key: 'uploading', i18nKey: 'studio.progressAnalyzing' },
   { key: 'dubbing', i18nKey: 'studio.progressDubbing' },
+  { key: 're-dubbing', i18nKey: 'studio.progressReDubbing' },
   { key: 'lip-syncing', i18nKey: 'studio.progressLipSync' },
 ] as const;
 
@@ -38,7 +39,7 @@ function isDownloadAvailable(type: string, links: PersoDownloadLinks | null): bo
 interface ResultStepProps {
   loadingProject: boolean;
   isProcessing: boolean;
-  processStage: 'uploading' | 'dubbing' | 'lip-syncing' | 'done';
+  processStage: 'uploading' | 'dubbing' | 're-dubbing' | 'lip-syncing' | 'done';
   progress: number;
   remainingMinutes: number | null;
   error: string | null;
@@ -64,8 +65,6 @@ interface ResultStepProps {
   onCopyShareLink: () => void;
   onEditChange: (seq: number, value: string) => void;
   onSaveSentence: (seq: number) => void;
-  onResetSentence: (seq: number) => void;
-  resettingSentence: number | null;
   onReset: () => void;
 }
 
@@ -98,8 +97,6 @@ export function ResultStep({
   onCopyShareLink,
   onEditChange,
   onSaveSentence,
-  onResetSentence,
-  resettingSentence,
   onReset,
 }: ResultStepProps) {
   const { t } = useTranslation();
@@ -240,10 +237,8 @@ export function ResultStep({
         sentences={sentences}
         editingValues={editingValues}
         savingSentence={savingSentence}
-        resettingSentence={resettingSentence}
         onEditChange={onEditChange}
         onSave={onSaveSentence}
-        onReset={onResetSentence}
       />
 
       <div className="text-center pt-4">

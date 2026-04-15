@@ -136,6 +136,7 @@ export default {
     processing: 'Processing...',
     progressAnalyzing: 'Analyzing video',
     progressDubbing: 'Generating dub',
+    progressReDubbing: 'Re-generating edited dub',
     progressLipSync: 'Applying lip-sync',
     resultTitle: 'Dubbing complete',
     downloadVideo: 'Download video (MP4)',

@@ -136,6 +136,7 @@ export default {
     processing: '처리 중...',
     progressAnalyzing: '영상 분석 중',
     progressDubbing: '더빙 생성 중',
+    progressReDubbing: '수정된 더빙 재생성 중',
     progressLipSync: '립싱크 적용 중',
     resultTitle: '더빙 완료',
     downloadVideo: '영상 다운로드 (MP4)',

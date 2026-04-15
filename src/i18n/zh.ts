@@ -136,6 +136,7 @@ export default {
     processing: '处理中...',
     progressAnalyzing: '视频分析中',
     progressDubbing: '生成配音中',
+    progressReDubbing: '重新生成修改后的配音',
     progressLipSync: '应用口型同步中',
     resultTitle: '配音完成',
     downloadVideo: '下载视频（MP4）',
