@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { useClipboard } from '../hooks/useClipboard';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
   listSpaces,
   uploadVideoFile,
@@ -26,6 +26,7 @@ import { getErrorMessage } from '../utils/format';
 import {
   getDownloadUrl,
   computeDubbingProgress,
+  computeDeductSeconds,
   buildShareUrl,
   toggleArrayItem,
   PROGRESS_GET_SPACE,
@@ -46,6 +47,7 @@ import { ResultStep } from '../components/ResultStep';
 export default function StudioPage() {
   const { t } = useTranslation();
   usePageTitle('pageTitle.studio');
+  const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
 
@@ -204,6 +206,18 @@ export default function StudioPage() {
       setProgress(PROGRESS_UPLOAD_DONE);
       uploadedFileRef.current = uploadedFile;
 
+      // 2.5. Credit guard — check balance before proceeding
+      const requiredSeconds = computeDeductSeconds(uploadedFile.durationMs, targetLanguages.length);
+      const currentCredits = useAuthStore.getState().user?.creditSeconds ?? 0;
+      if (currentCredits < requiredSeconds) {
+        const requiredMin = Math.ceil(requiredSeconds / 60);
+        const balanceMin = Math.floor(currentCredits / 60);
+        setError(t('studio.insufficientCredits', { required: requiredMin, balance: balanceMin }));
+        setIsProcessing(false);
+        navigate('/pricing');
+        return;
+      }
+
       // 3. Ensure the queue exists before the first translation request
       setProgress(PROGRESS_QUEUE_ENSURED);
       await ensureSpaceQueue(space.spaceSeq);
@@ -238,6 +252,10 @@ export default function StudioPage() {
         persoSpaceSeq: space.spaceSeq,
       });
       setDbProjectId(dbProject.id);
+
+      // Deduct credits upfront
+      const deductResult = await deductCredits(dbProject.id, uploadedFile.durationMs, targetLanguages.length);
+      useAuthStore.getState().setCreditSeconds(deductResult.remainingSeconds);
 
       // 5. Poll progress (every 5 seconds)
       await pollProgress(primaryProjectSeq, space.spaceSeq, (p: PersoProgress) => {
@@ -277,11 +295,6 @@ export default function StudioPage() {
           audioUrl: links.audioFile?.voiceWithBackgroundAudioDownloadLink || links.audioFile?.voiceAudioDownloadLink,
           zipUrl: links.zippedFileDownloadLink,
         });
-        // Deduct credits
-        try {
-          const result = await deductCredits(dbProject.id, uploadedFile.durationMs, targetLanguages.length);
-          useAuthStore.getState().setCreditSeconds(result.remainingSeconds);
-        } catch { /* credits may not be set up yet */ }
       }
 
       setProgress(100);
@@ -293,7 +306,7 @@ export default function StudioPage() {
       setRemainingMinutes(null);
       setIsProcessing(false);
     }
-  }, [selectedFile, sourceLanguage, targetLanguages, withLipSync, t]);
+  }, [selectedFile, sourceLanguage, targetLanguages, withLipSync, t, navigate]);
 
   async function handleResetSentence(sentenceSeq: number) {
     if (!projectSeq) return;
