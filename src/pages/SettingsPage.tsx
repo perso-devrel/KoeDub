@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { useNavigate } from 'react-router-dom';
@@ -53,14 +53,16 @@ export default function SettingsPage() {
   const [transactions, setTransactions] = useState<CreditTransaction[]>([]);
   const [txLoading, setTxLoading] = useState(false);
 
-  useEffect(() => {
-    if (activeTab !== 'billing') return;
-    setTxLoading(true);
-    getCreditTransactions(50)
-      .then((res) => setTransactions(res.transactions))
-      .catch(() => {})
-      .finally(() => setTxLoading(false));
-  }, [activeTab]);
+  function handleTabChange(tab: Tab) {
+    setActiveTab(tab);
+    if (tab === 'billing') {
+      setTxLoading(true);
+      getCreditTransactions(50)
+        .then((res) => setTransactions(res.transactions))
+        .catch(() => {})
+        .finally(() => setTxLoading(false));
+    }
+  }
 
   const handleLanguageChange = (lang: 'ko' | 'en' | 'ja' | 'zh') => {
     setLanguage(lang);
@@ -81,7 +83,7 @@ export default function SettingsPage() {
           {SETTINGS_TABS.map((tab) => (
             <button
               key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
+              onClick={() => handleTabChange(tab.key)}
               className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                 activeTab === tab.key
                   ? 'gradient-bg text-white shadow-lg'
