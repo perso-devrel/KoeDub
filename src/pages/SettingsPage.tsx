@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { useNavigate } from 'react-router-dom';
 import { useUIStore } from '../stores/uiStore';
 import { useAuthStore } from '../stores/authStore';
 import { signOut } from '../services/firebase';
+import { getCreditTransactions, type CreditTransaction } from '../services/anivoiceApi';
 import { CheckmarkIcon } from '../components/icons';
 import { ProfileTab } from '../components/ProfileTab';
 import { SubscriptionTab } from '../components/SubscriptionTab';
@@ -18,11 +19,20 @@ const SETTINGS_TABS: { key: Tab; i18nKey: string }[] = [
   { key: 'language', i18nKey: 'settings.language' },
 ];
 
-const BILLING_HISTORY_ENTRIES = [
-  { date: '2026-03-01', descriptionKey: 'settings.billingBasicPlan', amount: '$4.99', statusKey: 'settings.paid' },
-  { date: '2026-02-01', descriptionKey: 'settings.billingBasicPlan', amount: '$4.99', statusKey: 'settings.paid' },
-  { date: '2026-01-15', descriptionKey: 'settings.billingCreditPack', amount: '$12.00', statusKey: 'settings.paid' },
-] as const;
+const CREDIT_PRICE_PER_MINUTE_USD = 1;
+
+function formatTxAmount(amountSeconds: number): string {
+  const minutes = Math.abs(amountSeconds) / 60;
+  const usd = minutes * CREDIT_PRICE_PER_MINUTE_USD;
+  const prefix = amountSeconds > 0 ? '+' : '-';
+  return `${prefix}$${usd.toFixed(2)}`;
+}
+
+function getTxTypeKey(type: string): string {
+  if (type === 'purchase') return 'settings.txTypePurchase';
+  if (type === 'dubbing_deduct') return 'settings.txTypeDubbingDeduct';
+  return 'settings.txTypeUnknown';
+}
 
 const TABLE_HEADER_CLASS = 'text-left text-sm font-medium text-gray-400 pb-3';
 
@@ -40,18 +50,22 @@ export default function SettingsPage() {
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>('profile');
+  const [transactions, setTransactions] = useState<CreditTransaction[]>([]);
+  const [txLoading, setTxLoading] = useState(false);
+
+  useEffect(() => {
+    if (activeTab !== 'billing') return;
+    setTxLoading(true);
+    getCreditTransactions(50)
+      .then((res) => setTransactions(res.transactions))
+      .catch(() => {})
+      .finally(() => setTxLoading(false));
+  }, [activeTab]);
 
   const handleLanguageChange = (lang: 'ko' | 'en' | 'ja' | 'zh') => {
     setLanguage(lang);
     i18n.changeLanguage(lang);
   };
-
-  const billingHistory = BILLING_HISTORY_ENTRIES.map((entry) => ({
-    date: entry.date,
-    description: t(entry.descriptionKey),
-    amount: entry.amount,
-    status: t(entry.statusKey),
-  }));
 
   return (
     <main className="min-h-screen bg-surface-950 pt-24 pb-16 px-4">
@@ -101,49 +115,55 @@ export default function SettingsPage() {
               {t('settings.paymentHistory')}
             </h2>
 
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-surface-700">
-                    <th className={`${TABLE_HEADER_CLASS} pr-4`}>
-                      {t('settings.date')}
-                    </th>
-                    <th className={`${TABLE_HEADER_CLASS} pr-4`}>
-                      {t('settings.description')}
-                    </th>
-                    <th className={`${TABLE_HEADER_CLASS} pr-4`}>
-                      {t('settings.amount')}
-                    </th>
-                    <th className={TABLE_HEADER_CLASS}>
-                      {t('settings.status')}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {billingHistory.map((row, i) => (
-                    <tr
-                      key={i}
-                      className="border-b border-surface-800 last:border-0"
-                    >
-                      <td className="py-4 pr-4 text-sm text-gray-300">
-                        {row.date}
-                      </td>
-                      <td className="py-4 pr-4 text-sm text-white">
-                        {row.description}
-                      </td>
-                      <td className="py-4 pr-4 text-sm text-white font-medium">
-                        {row.amount}
-                      </td>
-                      <td className="py-4">
-                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-400">
-                          {row.status}
-                        </span>
-                      </td>
+            {txLoading ? (
+              <p className="text-gray-400 text-sm py-8 text-center">{t('settings.loadingTransactions')}</p>
+            ) : transactions.length === 0 ? (
+              <p className="text-gray-400 text-sm py-8 text-center">{t('settings.noTransactions')}</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-surface-700">
+                      <th className={`${TABLE_HEADER_CLASS} pr-4`}>
+                        {t('settings.date')}
+                      </th>
+                      <th className={`${TABLE_HEADER_CLASS} pr-4`}>
+                        {t('settings.description')}
+                      </th>
+                      <th className={`${TABLE_HEADER_CLASS} pr-4`}>
+                        {t('settings.amount')}
+                      </th>
+                      <th className={TABLE_HEADER_CLASS}>
+                        {t('settings.status')}
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {transactions.map((tx) => (
+                      <tr
+                        key={tx.id}
+                        className="border-b border-surface-800 last:border-0"
+                      >
+                        <td className="py-4 pr-4 text-sm text-gray-300">
+                          {tx.createdAt.slice(0, 10)}
+                        </td>
+                        <td className="py-4 pr-4 text-sm text-white">
+                          {t(getTxTypeKey(tx.type))}
+                        </td>
+                        <td className={`py-4 pr-4 text-sm font-medium ${tx.amountSeconds > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                          {formatTxAmount(tx.amountSeconds)}
+                        </td>
+                        <td className="py-4">
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-400">
+                            {t('settings.paid')}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
 

@@ -47,3 +47,7 @@ export function buildShareUrl(origin: string, dbProjectId: number | null): strin
 export function toggleArrayItem<T>(arr: T[], item: T): T[] {
   return arr.includes(item) ? arr.filter((v) => v !== item) : [...arr, item];
 }
+
+export function computeDeductSeconds(durationMs: number, languageCount: number): number {
+  return Math.ceil(durationMs / 1000) * Math.max(1, Math.floor(languageCount));
+}

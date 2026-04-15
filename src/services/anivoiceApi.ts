@@ -151,6 +151,21 @@ export async function getCreditHistory(days = 30): Promise<{ days: number; data:
   return data;
 }
 
+export interface CreditTransaction {
+  id: number;
+  type: string;
+  amountSeconds: number;
+  balanceAfter: number;
+  description: string | null;
+  projectId: number | null;
+  createdAt: string;
+}
+
+export async function getCreditTransactions(limit = 20, offset = 0): Promise<{ transactions: CreditTransaction[]; total: number }> {
+  const { data } = await api.get('/credits/transactions', { params: { limit, offset } });
+  return data;
+}
+
 // ── Library (public, no auth) ──
 
 export interface LibraryItem {
