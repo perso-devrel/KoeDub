@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '../hooks/usePageTitle';
@@ -48,48 +48,65 @@ const CREDIT_PACKS = [
 const LANDING_SECTION_CLASS = "px-4 py-20 md:py-28 mx-auto";
 const SECTION_HEADING_CLASS = "text-3xl md:text-4xl font-bold text-center gradient-text";
 
-const WAVEFORM_ORIGINAL = [3, 5, 2, 6, 4, 7, 3, 5, 2, 4, 6, 3, 5, 7, 4];
-const WAVEFORM_DUBBED = [4, 6, 3, 7, 5, 2, 6, 4, 7, 3, 5, 2, 6, 4, 5];
-const WAVEFORM_HEIGHT_MULTIPLIER = 3;
+const SAMPLE_VIDEO_ORIGINAL = '/sample_original_ja.mp4';
+const SAMPLE_VIDEO_DUBBED = '/sample_dubbed_en.mp4';
 
 /* ------------------------------------------------------------------ */
 /*  Sub-components                                                    */
 /* ------------------------------------------------------------------ */
 
-function WaveformBars({ data, colorClass }: { data: number[]; colorClass: string }) {
-  return (
-    <div className="absolute bottom-3 left-3 flex items-end gap-0.5">
-      {data.map((h, i) => (
-        <div key={i} className={`w-1 ${colorClass} rounded-full`} style={{ height: `${h * WAVEFORM_HEIGHT_MULTIPLIER}px` }} />
-      ))}
-    </div>
-  );
-}
-
 function VideoPreviewBox({
   badgeLabel,
   badgeClass,
   langLabel,
-  waveformData,
-  waveformColor,
+  src,
 }: {
   badgeLabel: string;
   badgeClass: string;
   langLabel: string;
-  waveformData: number[];
-  waveformColor: string;
+  src: string;
 }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [playing, setPlaying] = useState(false);
+
+  const handleToggle = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) {
+      video.play();
+      setPlaying(true);
+    } else {
+      video.pause();
+      setPlaying(false);
+    }
+  };
+
   return (
-    <div className="relative rounded-xl overflow-hidden bg-surface-900 aspect-video flex items-center justify-center group cursor-pointer">
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-      <PlayIcon className="w-12 h-12 text-white/80" />
+    <div
+      className="relative rounded-xl overflow-hidden bg-surface-900 aspect-video group cursor-pointer"
+      onClick={handleToggle}
+    >
+      <video
+        ref={videoRef}
+        src={src}
+        className="w-full h-full object-cover"
+        preload="metadata"
+        playsInline
+        onEnded={() => setPlaying(false)}
+      />
+      {!playing && (
+        <div className="absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity">
+          <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+            <PlayIcon className="w-7 h-7 text-white ml-0.5" />
+          </div>
+        </div>
+      )}
       <span className={`absolute top-3 left-3 ${badgeClass} text-xs text-white px-3 py-1 rounded-full font-medium`}>
         {badgeLabel}
       </span>
       <span className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm text-xs text-gray-300 px-3 py-1 rounded-full">
         {langLabel}
       </span>
-      <WaveformBars data={waveformData} colorClass={waveformColor} />
     </div>
   );
 }
@@ -237,23 +254,21 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Video comparison mock */}
-          <div className="max-w-4xl mx-auto animate-float">
+          {/* Video comparison */}
+          <div className="max-w-4xl mx-auto">
             <div className="glass rounded-2xl p-4 md:p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <VideoPreviewBox
                   badgeLabel={t('landing.videoOriginal')}
                   badgeClass="bg-black/60 backdrop-blur-sm"
                   langLabel={t('landing.videoOriginalLang')}
-                  waveformData={WAVEFORM_ORIGINAL}
-                  waveformColor="bg-primary-400/60"
+                  src={SAMPLE_VIDEO_ORIGINAL}
                 />
                 <VideoPreviewBox
                   badgeLabel={t('landing.videoDubbed')}
                   badgeClass="gradient-bg"
                   langLabel={t('landing.videoDubbedLang')}
-                  waveformData={WAVEFORM_DUBBED}
-                  waveformColor="bg-accent-400/60"
+                  src={SAMPLE_VIDEO_DUBBED}
                 />
               </div>
             </div>
