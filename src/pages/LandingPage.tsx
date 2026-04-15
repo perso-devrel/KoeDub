@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '../hooks/usePageTitle';
-import { UploadIcon, VoiceIcon, GlobeIcon, LipSyncIcon, EditIcon, SettingsIcon, DownloadIcon, PlayIcon, CheckmarkIcon, ChevronDownIcon } from '../components/icons';
+import { UploadIcon, VoiceIcon, GlobeIcon, LipSyncIcon, EditIcon, SettingsIcon, DownloadIcon, PlayIcon, ChevronDownIcon, ClockIcon } from '../components/icons';
 import { SUPPORTED_LANGUAGES } from '../constants';
+import { CREDIT_PRICE_PER_MINUTE_USD, TIME_PACK_10_MIN_SECONDS, TIME_PACK_50_MIN_SECONDS, TIME_PACK_100_MIN_SECONDS, TIME_PACK_10_MIN_PRICE, TIME_PACK_50_MIN_PRICE, TIME_PACK_100_MIN_PRICE } from '../utils/pricing';
 
 const FAQ_KEYS = [
   { qKey: 'landing.faqVoiceQ', aKey: 'landing.faqVoiceA' },
@@ -38,58 +39,74 @@ const STEP_ICONS: Record<string, React.ReactNode> = {
   download: <DownloadIcon className="w-10 h-10" />,
 };
 
-const PLAN_KEYS = [
-  { nameKey: 'pricing.free.name', priceKey: 'pricing.free.price', featuresKey: 'pricing.free.features', highlight: false },
-  { nameKey: 'pricing.basic.name', priceKey: 'pricing.basic.price', featuresKey: 'pricing.basic.features', highlight: false },
-  { nameKey: 'pricing.pro.name', priceKey: 'pricing.pro.price', featuresKey: 'pricing.pro.features', highlight: true },
-  { nameKey: 'pricing.payPerUse.name', priceKey: 'pricing.payPerUse.price', featuresKey: 'pricing.payPerUse.features', highlight: false },
+const CREDIT_PACKS = [
+  { seconds: TIME_PACK_10_MIN_SECONDS, labelKey: 'pricing.timePack10', price: TIME_PACK_10_MIN_PRICE },
+  { seconds: TIME_PACK_50_MIN_SECONDS, labelKey: 'pricing.timePack50', price: TIME_PACK_50_MIN_PRICE },
+  { seconds: TIME_PACK_100_MIN_SECONDS, labelKey: 'pricing.timePack100', price: TIME_PACK_100_MIN_PRICE },
 ];
 
 const LANDING_SECTION_CLASS = "px-4 py-20 md:py-28 mx-auto";
 const SECTION_HEADING_CLASS = "text-3xl md:text-4xl font-bold text-center gradient-text";
 
-const WAVEFORM_ORIGINAL = [3, 5, 2, 6, 4, 7, 3, 5, 2, 4, 6, 3, 5, 7, 4];
-const WAVEFORM_DUBBED = [4, 6, 3, 7, 5, 2, 6, 4, 7, 3, 5, 2, 6, 4, 5];
-const WAVEFORM_HEIGHT_MULTIPLIER = 3;
+const SAMPLE_VIDEO_ORIGINAL = '/sample_original_ja.mp4';
+const SAMPLE_VIDEO_DUBBED = '/sample_dubbed_en.mp4';
 
 /* ------------------------------------------------------------------ */
 /*  Sub-components                                                    */
 /* ------------------------------------------------------------------ */
 
-function WaveformBars({ data, colorClass }: { data: number[]; colorClass: string }) {
-  return (
-    <div className="absolute bottom-3 left-3 flex items-end gap-0.5">
-      {data.map((h, i) => (
-        <div key={i} className={`w-1 ${colorClass} rounded-full`} style={{ height: `${h * WAVEFORM_HEIGHT_MULTIPLIER}px` }} />
-      ))}
-    </div>
-  );
-}
-
 function VideoPreviewBox({
   badgeLabel,
   badgeClass,
   langLabel,
-  waveformData,
-  waveformColor,
+  src,
 }: {
   badgeLabel: string;
   badgeClass: string;
   langLabel: string;
-  waveformData: number[];
-  waveformColor: string;
+  src: string;
 }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [playing, setPlaying] = useState(false);
+
+  const handleToggle = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) {
+      video.play();
+      setPlaying(true);
+    } else {
+      video.pause();
+      setPlaying(false);
+    }
+  };
+
   return (
-    <div className="relative rounded-xl overflow-hidden bg-surface-900 aspect-video flex items-center justify-center group cursor-pointer">
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-      <PlayIcon className="w-12 h-12 text-white/80" />
+    <div
+      className="relative rounded-xl overflow-hidden bg-surface-900 aspect-video group cursor-pointer"
+      onClick={handleToggle}
+    >
+      <video
+        ref={videoRef}
+        src={src}
+        className="w-full h-full object-cover"
+        preload="metadata"
+        playsInline
+        onEnded={() => setPlaying(false)}
+      />
+      {!playing && (
+        <div className="absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity">
+          <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+            <PlayIcon className="w-7 h-7 text-white ml-0.5" />
+          </div>
+        </div>
+      )}
       <span className={`absolute top-3 left-3 ${badgeClass} text-xs text-white px-3 py-1 rounded-full font-medium`}>
         {badgeLabel}
       </span>
       <span className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm text-xs text-gray-300 px-3 py-1 rounded-full">
         {langLabel}
       </span>
-      <WaveformBars data={waveformData} colorClass={waveformColor} />
     </div>
   );
 }
@@ -143,57 +160,25 @@ function StepCard({
   );
 }
 
-function PricingCard({
-  name,
+function CreditPackCard({
+  label,
   price,
-  features,
-  highlight,
-  selectLabel,
-  popularLabel,
 }: {
-  name: string;
-  price: string;
-  features: string[];
-  highlight: boolean;
-  selectLabel: string;
-  popularLabel?: string;
+  label: string;
+  price: number;
 }) {
   return (
-    <div
-      className={`rounded-2xl p-6 flex flex-col relative transition-transform duration-300 hover:scale-[1.03] ${
-        highlight
-          ? 'gradient-bg shadow-2xl shadow-primary-500/20 ring-2 ring-primary-400/50'
-          : 'glass'
-      }`}
-    >
-      {highlight && (
-        <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary-500 text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wider">
-          {popularLabel}
-        </span>
-      )}
-      <h3 className="text-xl font-bold mb-1 text-white">
-        {name}
-      </h3>
-      <p className={`text-3xl font-extrabold mb-6 ${highlight ? 'text-white' : 'gradient-text'}`}>
-        {price}
-      </p>
-      <ul className="space-y-3 mb-8 flex-1">
-        {features.map((f, i) => (
-          <li key={i} className="flex items-start gap-2 text-sm">
-            <CheckmarkIcon className="w-5 h-5 text-primary-400 shrink-0" />
-            <span className={highlight ? 'text-white/90' : 'text-gray-300'}>{f}</span>
-          </li>
-        ))}
-      </ul>
+    <div className="glass rounded-2xl p-6 flex flex-col items-center text-center hover:scale-[1.03] transition-transform duration-300">
+      <div className="w-12 h-12 rounded-xl bg-primary-500/20 flex items-center justify-center mb-4">
+        <ClockIcon className="w-6 h-6 text-primary-400" />
+      </div>
+      <p className="text-2xl font-bold text-white mb-1">{label}</p>
+      <p className="text-3xl font-bold gradient-text mb-6">${price}</p>
       <Link
-        to="/signup"
-        className={`block text-center py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-200 ${
-          highlight
-            ? 'bg-white text-primary-600 hover:bg-gray-100'
-            : 'border border-primary-500/50 text-primary-400 hover:bg-primary-500/10'
-        }`}
+        to="/pricing"
+        className="mt-auto w-full text-center py-3 rounded-xl border border-surface-600 text-gray-300 font-medium hover:border-primary-500 hover:text-white transition-colors"
       >
-        {selectLabel}
+        {label}
       </Link>
     </div>
   );
@@ -269,23 +254,21 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Video comparison mock */}
-          <div className="max-w-4xl mx-auto animate-float">
+          {/* Video comparison */}
+          <div className="max-w-4xl mx-auto">
             <div className="glass rounded-2xl p-4 md:p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <VideoPreviewBox
                   badgeLabel={t('landing.videoOriginal')}
                   badgeClass="bg-black/60 backdrop-blur-sm"
                   langLabel={t('landing.videoOriginalLang')}
-                  waveformData={WAVEFORM_ORIGINAL}
-                  waveformColor="bg-primary-400/60"
+                  src={SAMPLE_VIDEO_ORIGINAL}
                 />
                 <VideoPreviewBox
                   badgeLabel={t('landing.videoDubbed')}
                   badgeClass="gradient-bg"
                   langLabel={t('landing.videoDubbedLang')}
-                  waveformData={WAVEFORM_DUBBED}
-                  waveformColor="bg-accent-400/60"
+                  src={SAMPLE_VIDEO_DUBBED}
                 />
               </div>
             </div>
@@ -357,23 +340,19 @@ export default function LandingPage() {
         {/* ============================================================ */}
         {/*  PRICING                                                     */}
         {/* ============================================================ */}
-        <section className={`${LANDING_SECTION_CLASS} max-w-6xl`}>
+        <section className={`${LANDING_SECTION_CLASS} max-w-4xl`}>
           <h2 className={`${SECTION_HEADING_CLASS} mb-4`}>
             {t('pricing.title')}
           </h2>
           <p className="text-gray-400 text-center mb-14 max-w-lg mx-auto">
-            {t('pricing.subtitle')}
+            {t('pricing.creditOnlySubtitle', { price: CREDIT_PRICE_PER_MINUTE_USD })}
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {PLAN_KEYS.map((plan) => (
-              <PricingCard
-                key={plan.nameKey}
-                name={t(plan.nameKey)}
-                price={t(plan.priceKey)}
-                features={t(plan.featuresKey, { returnObjects: true }) as string[]}
-                highlight={plan.highlight}
-                selectLabel={t('pricing.selectPlan')}
-                popularLabel={plan.highlight ? t('landing.popular') : undefined}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {CREDIT_PACKS.map((pack) => (
+              <CreditPackCard
+                key={pack.seconds}
+                label={t(pack.labelKey)}
+                price={pack.price}
               />
             ))}
           </div>
