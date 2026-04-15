@@ -327,25 +327,6 @@ export default function StudioPage() {
     }
   }
 
-  async function handleResetSentence(sentenceSeq: number) {
-    if (!projectSeq) return;
-    setResettingSentence(sentenceSeq);
-    try {
-      await resetSentence(projectSeq, sentenceSeq);
-      const script = await getScript(projectSeq, spaceSeq!);
-      setSentences(script.sentences);
-      setEditingValues((prev) => {
-        const next = { ...prev };
-        delete next[sentenceSeq];
-        return next;
-      });
-    } catch (err) {
-      setError(getErrorMessage(err));
-    } finally {
-      setResettingSentence(null);
-    }
-  }
-
   async function handleSaveSentence(sentenceSeq: number) {
     if (!projectSeq || !(sentenceSeq in editingValues)) return;
     setSavingSentence(sentenceSeq);
