@@ -256,7 +256,7 @@ export async function getExternalMetadata(
 interface TranslateRequest {
   mediaSeq: number;
   isVideoProject: boolean;
-  sourceLanguageCode?: string;
+  sourceLanguageCode: string;
   targetLanguageCodes: string[];
   numberOfSpeakers: number;
   withLipSync?: boolean;
@@ -480,6 +480,20 @@ export async function resetSentence(projectSeq: number, sentenceSeq: number) {
     `/video-translator/api/v1/project/${projectSeq}/audio-sentence/${sentenceSeq}/reset`
   );
   return unwrapResult(data);
+}
+
+export async function requestProofread(
+  projectSeq: number,
+  spaceSeq: number,
+  isLipSync = false
+) {
+  return retryWithBackoff(async () => {
+    const { data } = await api.post(
+      `/video-translator/api/v1/project/${projectSeq}/space/${spaceSeq}/proofread`,
+      { isLipSync, preferredSpeedType: 'GREEN' }
+    );
+    return unwrapResult(data);
+  });
 }
 
 export async function requestLipSync(projectSeq: number, spaceSeq: number) {

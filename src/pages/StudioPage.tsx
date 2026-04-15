@@ -13,7 +13,7 @@ import {
   getProgress,
   translateSentence,
   generateSentenceAudio,
-  resetSentence,
+  requestProofread,
   requestLipSync,
   getDownloadLinks,
   resolvePersoFileUrl,
@@ -59,7 +59,7 @@ export default function StudioPage() {
 
   // Processing
   const [isProcessing, setIsProcessing] = useState(false);
-  const [processStage, setProcessStage] = useState<'uploading' | 'dubbing' | 'lip-syncing' | 'done'>('uploading');
+  const [processStage, setProcessStage] = useState<'uploading' | 'dubbing' | 're-dubbing' | 'lip-syncing' | 'done'>('uploading');
   const [progress, setProgress] = useState(0);
   const [remainingMinutes, setRemainingMinutes] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -71,7 +71,6 @@ export default function StudioPage() {
   const [sentences, setSentences] = useState<PersoScriptSentence[]>([]);
   const [editingValues, setEditingValues] = useState<Record<number, string>>({});
   const [savingSentence, setSavingSentence] = useState<number | null>(null);
-  const [resettingSentence, setResettingSentence] = useState<number | null>(null);
   const [loadingProject, setLoadingProject] = useState(false);
 
   // DB project tracking
@@ -228,7 +227,7 @@ export default function StudioPage() {
       const projectIds = await requestTranslation(space.spaceSeq, {
         mediaSeq: Number(uploadedFile.seq),
         isVideoProject: true,
-        sourceLanguageCode: sourceLanguage === 'auto' ? undefined : sourceLanguage,
+        sourceLanguageCode: sourceLanguage,
         targetLanguageCodes: targetLanguages,
         numberOfSpeakers: 1,
         withLipSync,
@@ -308,25 +307,6 @@ export default function StudioPage() {
     }
   }, [selectedFile, sourceLanguage, targetLanguages, withLipSync, t, navigate]);
 
-  async function handleResetSentence(sentenceSeq: number) {
-    if (!projectSeq) return;
-    setResettingSentence(sentenceSeq);
-    try {
-      await resetSentence(projectSeq, sentenceSeq);
-      const script = await getScript(projectSeq, spaceSeq!);
-      setSentences(script.sentences);
-      setEditingValues((prev) => {
-        const next = { ...prev };
-        delete next[sentenceSeq];
-        return next;
-      });
-    } catch (err) {
-      setError(getErrorMessage(err));
-    } finally {
-      setResettingSentence(null);
-    }
-  }
-
   async function handleSaveSentence(sentenceSeq: number) {
     if (!projectSeq || !(sentenceSeq in editingValues)) return;
     setSavingSentence(sentenceSeq);
@@ -347,8 +327,24 @@ export default function StudioPage() {
         delete next[sentenceSeq];
         return next;
       });
+
+      // Re-process translations and refresh download links
+      if (spaceSeq) {
+        setProcessStage('re-dubbing');
+        setIsProcessing(true);
+        await requestProofread(projectSeq, spaceSeq);
+        await pollProgress(projectSeq, spaceSeq, (p) => {
+          setProgress(p.progress);
+        });
+        const links = await getDownloadLinks(projectSeq, spaceSeq);
+        setDownloadLinks(links);
+        setIsProcessing(false);
+        setProcessStage('done');
+        setProgress(100);
+      }
     } catch (err) {
       setError(getErrorMessage(err));
+      setIsProcessing(false);
     } finally {
       setSavingSentence(null);
     }
@@ -479,7 +475,6 @@ export default function StudioPage() {
             sentences={sentences}
             editingValues={editingValues}
             savingSentence={savingSentence}
-            resettingSentence={resettingSentence}
             isPublished={isPublished}
             isPublishing={isPublishing}
             tags={tags}
@@ -495,7 +490,6 @@ export default function StudioPage() {
             onCopyShareLink={handleCopyShareLink}
             onEditChange={(seq, value) => setEditingValues((prev) => ({ ...prev, [seq]: value }))}
             onSaveSentence={handleSaveSentence}
-            onResetSentence={handleResetSentence}
             onReset={handleResetProject}
           />
         )}

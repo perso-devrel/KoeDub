@@ -136,6 +136,7 @@ export default {
     processing: '処理中...',
     progressAnalyzing: '動画を分析中',
     progressDubbing: '吹き替えを生成中',
+    progressReDubbing: '修正された吹き替えを再生成中',
     progressLipSync: 'リップシンクを適用中',
     resultTitle: '吹き替え完了',
     downloadVideo: '動画をダウンロード（MP4）',
