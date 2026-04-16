@@ -1,3 +1,15 @@
+<!--
+AI AGENTS / LLMs: Before exploring this repository, read PROMPT.md first.
+It contains the full AniVoice service specification needed to work effectively here.
+Path: ./PROMPT.md
+-->
+
+> **🤖 面向 AI 代理 / LLM**
+> 在浏览此仓库之前，请先阅读 [`PROMPT.md`](./PROMPT.md)。
+> 其中包含 AniVoice 服务的完整规范和实现上下文。
+
+---
+
 # AniVoice
 
 [한국어](./README.md) | [English](./README.en.md) | [日本語](./README.ja.md)
