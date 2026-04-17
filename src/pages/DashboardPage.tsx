@@ -1,8 +1,9 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { listMyProjects, toggleFavorite, getCreditHistory, type DbProject, type CreditHistoryDay } from '../services/anivoiceApi';
+import { getProgress } from '../services/persoApi';
 import { formatCreditTime, formatDuration, getErrorMessage } from '../utils/format';
 import { PlusIcon, AlertCircleIcon, SearchIcon, StarIcon, LoadingSpinner } from '../components/icons';
 import { DashboardToolbar } from '../components/DashboardToolbar';
@@ -16,6 +17,8 @@ import type { ProjectStatus } from '../types';
 
 const PROJECT_PAGE_SIZE = 20;
 const CREDIT_HISTORY_DAYS = 30;
+const PROGRESS_POLL_MS = 5000;
+const ACTIVE_STATUSES = new Set(['analyzing', 'uploading', 'dubbing', 'lip-syncing']);
 
 const DASHBOARD_TABS: { key: FilterTab; i18nKey: string }[] = [
   { key: 'all', i18nKey: 'common.all' },
@@ -104,6 +107,55 @@ export default function DashboardPage() {
     fetchUsage();
     return () => { cancelled = true; };
   }, []);
+
+  const activeProjectsRef = useRef<DbProject[]>([]);
+
+  const pollActiveProjects = useCallback(async () => {
+    const active = activeProjectsRef.current;
+    if (active.length === 0) return;
+
+    const updates = await Promise.allSettled(
+      active.map((p) =>
+        getProgress(p.persoProjectSeq!, p.persoSpaceSeq!).then((res) => ({
+          id: p.id,
+          progress: res.progress,
+          failed: res.hasFailed,
+          reason: (res.progressReason || '').toUpperCase(),
+        })),
+      ),
+    );
+
+    setProjects((prev) => {
+      let changed = false;
+      const next = prev.map((p) => {
+        const idx = active.findIndex((a) => a.id === p.id);
+        if (idx === -1) return p;
+        const result = updates[idx];
+        if (result.status !== 'fulfilled') return p;
+        const { progress, failed, reason } = result.value;
+        let status = p.status;
+        if (failed || reason === 'FAILED') status = 'failed';
+        else if (reason === 'COMPLETED' || progress >= 100) status = 'completed';
+        if (status !== p.status || progress !== p.progress) {
+          changed = true;
+          return { ...p, progress, status };
+        }
+        return p;
+      });
+      return changed ? next : prev;
+    });
+  }, []);
+
+  useEffect(() => {
+    const active = projects.filter(
+      (p) => p.persoProjectSeq && p.persoSpaceSeq && ACTIVE_STATUSES.has(mapDbStatus(p)),
+    );
+    activeProjectsRef.current = active;
+    if (active.length === 0) return;
+
+    const id = setInterval(pollActiveProjects, PROGRESS_POLL_MS);
+    return () => clearInterval(id);
+  }, [projects, pollActiveProjects]);
 
   const mappedProjects = projects.map((p) => ({
     ...p,
