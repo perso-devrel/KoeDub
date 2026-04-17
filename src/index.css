@@ -1,6 +1,9 @@
 @import "tailwindcss";
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+JP:wght@400;700;900&display=swap');
 
 @theme {
+  /* ── legacy brand tokens (other pages still depend on these) ─────── */
   --color-primary-50: #fff7ed;
   --color-primary-100: #ffedd5;
   --color-primary-200: #fed7aa;
@@ -31,6 +34,22 @@
   --color-surface-850: #162032;
   --color-surface-900: #0f172a;
   --color-surface-950: #020617;
+
+  /* ── EDGERUNNERS palette ─────────────────────────────────────────── */
+  --color-void: #0A0A0A;
+  --color-ink: #1A1A1A;
+  --color-bone: #F5F0E6;
+  --color-lucy: #FF4FA3;
+  --color-david: #FCEE0A;
+  --color-rebecca: #FF2E63;
+  --color-wire: #00F0FF;
+  --color-edge: #FF6B00;
+
+  /* ── typography stacks ───────────────────────────────────────────── */
+  --font-display: 'Space Grotesk', 'Pretendard Variable', system-ui, sans-serif;
+  --font-body: 'Pretendard Variable', 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-jp: 'Noto Sans JP', 'Pretendard Variable', sans-serif;
 }
 
 @layer base {
@@ -40,16 +59,20 @@
   }
 
   ::selection {
-    background-color: var(--color-primary-500);
-    color: white;
+    background-color: var(--color-lucy);
+    color: var(--color-void);
   }
 
   body {
     margin: 0;
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 }
 
 @layer utilities {
+  /* legacy utilities — other pages depend on these */
   .gradient-text {
     background: linear-gradient(135deg, var(--color-primary-400), var(--color-accent-400));
     -webkit-background-clip: text;
@@ -83,6 +106,106 @@
   @keyframes fadeSlideIn {
     from { opacity: 0; transform: translateY(-8px); }
     to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── EDGERUNNERS utilities ───────────────────────────────────────── */
+
+  /* thin scanlines overlay — pair with position:relative parent */
+  .scanlines::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0px,
+      rgba(0, 0, 0, 0) 2px,
+      rgba(245, 240, 230, 0.05) 2px,
+      rgba(245, 240, 230, 0.05) 3px
+    );
+    z-index: 1;
+    mix-blend-mode: overlay;
+  }
+
+  /* grainy film noise — attached via ::before */
+  .film-grain::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.6 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: 0.08;
+    z-index: 2;
+    mix-blend-mode: overlay;
+  }
+
+  /* offset block shadows (no gradients, single flat color) */
+  .offset-lucy { box-shadow: 10px 10px 0 0 var(--color-lucy); }
+  .offset-david { box-shadow: 10px 10px 0 0 var(--color-david); }
+  .offset-wire { box-shadow: 10px 10px 0 0 var(--color-wire); }
+  .offset-bone { box-shadow: 10px 10px 0 0 var(--color-bone); }
+  .offset-void { box-shadow: 10px 10px 0 0 var(--color-void); }
+  .offset-lucy-sm { box-shadow: 5px 5px 0 0 var(--color-lucy); }
+  .offset-david-sm { box-shadow: 5px 5px 0 0 var(--color-david); }
+  .offset-void-sm { box-shadow: 5px 5px 0 0 var(--color-void); }
+
+  /* chromatic aberration on hover — triggered, not constant */
+  .chromatic-hover {
+    transition: text-shadow 160ms ease-out, transform 160ms ease-out;
+  }
+  .chromatic-hover:hover {
+    text-shadow:
+      -2px 0 0 var(--color-wire),
+      2px 0 0 var(--color-rebecca);
+  }
+
+  /* outlined text — for katakana shadows */
+  .text-outline-bone {
+    -webkit-text-stroke: 1.5px var(--color-bone);
+    color: transparent;
+  }
+  .text-outline-void {
+    -webkit-text-stroke: 1.5px var(--color-void);
+    color: transparent;
+  }
+
+  /* corner marker — decorative brackets */
+  .corner-marks {
+    background-image:
+      linear-gradient(to right, currentColor 12px, transparent 12px),
+      linear-gradient(to bottom, currentColor 12px, transparent 12px),
+      linear-gradient(to left, currentColor 12px, transparent 12px),
+      linear-gradient(to top, currentColor 12px, transparent 12px);
+    background-size: 100% 2px, 2px 100%, 100% 2px, 2px 100%;
+    background-position: 0 0, 0 0, 100% 100%, 100% 100%;
+    background-repeat: no-repeat;
+  }
+
+  /* one-shot flicker on group hover / intersection */
+  @keyframes flicker-once {
+    0%, 100% { opacity: 1; }
+    20% { opacity: 0.2; }
+    22% { opacity: 1; }
+    60% { opacity: 0.6; }
+    62% { opacity: 1; }
+  }
+  .flicker-on-hover { transition: none; }
+  .flicker-on-hover:hover { animation: flicker-once 420ms steps(8, end); }
+
+  /* sound effect pop — scales in once on intersection trigger */
+  @keyframes sfx-pop {
+    0% { transform: scale(0.6) rotate(-6deg); opacity: 0; }
+    60% { transform: scale(1.12) rotate(-6deg); opacity: 1; }
+    100% { transform: scale(1) rotate(-6deg); opacity: 1; }
+  }
+  .sfx-pop { animation: sfx-pop 360ms cubic-bezier(0.2, 0.9, 0.3, 1.4) both; }
+
+  /* diagonal slash divider between hero panels */
+  .slash-divider {
+    clip-path: polygon(0 0, 100% 0, calc(100% - 40px) 100%, 0 100%);
+  }
+  .slash-divider-r {
+    clip-path: polygon(40px 0, 100% 0, 100% 100%, 0 100%);
   }
 }
 
