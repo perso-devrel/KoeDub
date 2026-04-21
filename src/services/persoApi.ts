@@ -496,7 +496,6 @@ export async function getDownloadLinks(
     'dubbingVideo',
     'voiceAudio',
     'voicewithBackgroundAudio',
-    'translatedSubtitle',
     'all',
   ];
 
