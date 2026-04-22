@@ -23,8 +23,7 @@ export default function AuthPage() {
   const location = useLocation();
   const { user } = useAuthStore();
 
-  const initialMode: Mode = location.pathname === '/signup' ? 'signup' : 'login';
-  const [mode, setMode] = useState<Mode>(initialMode);
+  const mode: Mode = location.pathname === '/signup' ? 'signup' : 'login';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
@@ -35,11 +34,6 @@ export default function AuthPage() {
       navigate('/dashboard', { replace: true });
     }
   }, [user, navigate]);
-
-  useEffect(() => {
-    const newMode: Mode = location.pathname === '/signup' ? 'signup' : 'login';
-    setMode(newMode);
-  }, [location.pathname]);
 
   const handleSuccess = (u: User) => {
     useAuthStore.getState().setUser(u);
