@@ -18,6 +18,49 @@ Path: ../../PROMPT.md
 
 Powered by the [Perso.ai](https://developers.perso.ai) API.
 
+## Demo
+
+[![AniVoice Demo](https://img.youtube.com/vi/0bYM_8Q8eD0/maxresdefault.jpg)](https://youtu.be/0bYM_8Q8eD0)
+
+## Architecture
+
+```mermaid
+graph TB
+    subgraph Client["Client (React SPA)"]
+        UI[UI Components]
+        Pages[Page Router]
+        Stores[Zustand Stores]
+        Services[API Clients]
+    end
+
+    subgraph Vercel["Vercel Serverless Functions"]
+        Proxy[Perso API Proxy]
+        AuthAPI[Auth Middleware]
+        ProjectsAPI[Projects API]
+        LibraryAPI[Library API]
+        CreditsAPI[Credits API]
+    end
+
+    subgraph External["External Services"]
+        PersoAI["Perso.ai API\n(Dubbing · Translation · Lip Sync)"]
+        Firebase["Firebase Auth"]
+        Turso["Turso DB\n(libSQL)"]
+        Azure["Azure Blob\n(File Storage)"]
+    end
+
+    UI --> Pages --> Services
+    Pages --> Stores
+    Services -->|"/api/perso/*"| Proxy
+    Services -->|"/api/*"| AuthAPI
+    AuthAPI --> ProjectsAPI & LibraryAPI & CreditsAPI
+    Proxy -->|"XP-API-KEY injection"| PersoAI
+    AuthAPI -->|"Token verification"| Firebase
+    ProjectsAPI & LibraryAPI & CreditsAPI --> Turso
+    PersoAI --> Azure
+```
+
+> For detailed architecture documentation, see [`ARCHITECTURE.md`](../../ARCHITECTURE.md).
+
 ## Features
 
 - **AI Dubbing** — Upload a video and get multi-language dubs that preserve the character's voice tone
@@ -35,7 +78,7 @@ Japanese, Korean, English, Spanish, Portuguese, Indonesian, Arabic, Chinese
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | React 19, TypeScript, Vite, Tailwind CSS 4 |
+| Frontend | React 19, TypeScript 6, Vite 8, Tailwind CSS 4 |
 | State Management | Zustand |
 | Routing | React Router 7 |
 | Authentication | Firebase Authentication |
@@ -57,7 +100,7 @@ Japanese, Korean, English, Spanish, Portuguese, Indonesian, Arabic, Chinese
 ### Installation
 
 ```bash
-git clone https://github.com/your-username/anivoice.git
+git clone https://github.com/perso-devrel/anivoice.git
 cd anivoice
 npm install
 ```
@@ -135,6 +178,7 @@ anivoice/
 │   ├── i18n/               # Translation files
 │   ├── types/              # TypeScript type definitions
 │   └── App.tsx             # Router & layout
+├── docs/                   # Multilingual README
 ├── .env.example            # Environment variable template
 ├── vercel.json             # Vercel deployment config
 └── vite.config.ts          # Vite config (with proxy)
@@ -142,8 +186,12 @@ anivoice/
 
 ## Dubbing Workflow
 
-```
-Upload Video → Set Languages → AI Dubbing → Edit Subtitles → Download/Share
+```mermaid
+flowchart LR
+    A[Upload Video] --> B[Set Languages]
+    B --> C[AI Dubbing]
+    C --> D[Edit Subtitles]
+    D --> E[Download / Share]
 ```
 
 1. **Upload** — Upload MP4, MOV, or WebM files to Azure Blob Storage
@@ -170,6 +218,11 @@ To deploy on Vercel:
 3. Deploy automatically
 
 Security headers, SPA routing, and API rewrites are configured in `vercel.json`.
+
+## Security
+
+- Vulnerability reporting: [`SECURITY.md`](../../SECURITY.md)
+- Security audit report: [`SECURITY-AUDIT.md`](../../SECURITY-AUDIT.md)
 
 ## Contributing
 
