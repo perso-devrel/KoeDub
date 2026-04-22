@@ -31,9 +31,16 @@ import { useClipboard } from './useClipboard';
 describe('useClipboard', () => {
   beforeEach(() => {
     vi.useFakeTimers();
-    Object.assign(navigator, {
-      clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
-    });
+    const clipboardMock = { writeText: vi.fn().mockResolvedValue(undefined) };
+    if (typeof globalThis.navigator === 'undefined') {
+      Object.defineProperty(globalThis, 'navigator', {
+        value: { clipboard: clipboardMock },
+        writable: true,
+        configurable: true,
+      });
+    } else {
+      Object.assign(navigator, { clipboard: clipboardMock });
+    }
     cleanupFn = undefined;
   });
 

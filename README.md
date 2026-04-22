@@ -18,6 +18,49 @@ Path: ./PROMPT.md
 
 [Perso.ai](https://developers.perso.ai) API 기반으로 동작합니다.
 
+## 데모
+
+[![AniVoice Demo](https://img.youtube.com/vi/0bYM_8Q8eD0/maxresdefault.jpg)](https://youtu.be/0bYM_8Q8eD0)
+
+## 아키텍처
+
+```mermaid
+graph TB
+    subgraph Client["클라이언트 (React SPA)"]
+        UI[UI 컴포넌트]
+        Pages[페이지 라우터]
+        Stores[Zustand 스토어]
+        Services[API 클라이언트]
+    end
+
+    subgraph Vercel["Vercel Serverless Functions"]
+        Proxy[Perso API 프록시]
+        AuthAPI[인증 미들웨어]
+        ProjectsAPI[프로젝트 API]
+        LibraryAPI[라이브러리 API]
+        CreditsAPI[크레딧 API]
+    end
+
+    subgraph External["외부 서비스"]
+        PersoAI["Perso.ai API\n(더빙·번역·립싱크)"]
+        Firebase["Firebase Auth"]
+        Turso["Turso DB\n(libSQL)"]
+        Azure["Azure Blob\n(파일 저장소)"]
+    end
+
+    UI --> Pages --> Services
+    Pages --> Stores
+    Services -->|"/api/perso/*"| Proxy
+    Services -->|"/api/*"| AuthAPI
+    AuthAPI --> ProjectsAPI & LibraryAPI & CreditsAPI
+    Proxy -->|"XP-API-KEY 주입"| PersoAI
+    AuthAPI -->|"토큰 검증"| Firebase
+    ProjectsAPI & LibraryAPI & CreditsAPI --> Turso
+    PersoAI --> Azure
+```
+
+> 상세 아키텍처 문서는 [`ARCHITECTURE.md`](./ARCHITECTURE.md)를 참고하세요.
+
 ## 주요 기능
 
 - **AI 더빙** — 영상을 업로드하면 캐릭터 음성 톤을 유지한 채 다국어 더빙
@@ -35,7 +78,7 @@ Path: ./PROMPT.md
 
 | 영역 | 기술 |
 |------|------|
-| 프론트엔드 | React 19, TypeScript, Vite, Tailwind CSS 4 |
+| 프론트엔드 | React 19, TypeScript 6, Vite 8, Tailwind CSS 4 |
 | 상태 관리 | Zustand |
 | 라우팅 | React Router 7 |
 | 인증 | Firebase Authentication |
@@ -57,7 +100,7 @@ Path: ./PROMPT.md
 ### 설치
 
 ```bash
-git clone https://github.com/your-username/anivoice.git
+git clone https://github.com/perso-devrel/anivoice.git
 cd anivoice
 npm install
 ```
@@ -135,6 +178,7 @@ anivoice/
 │   ├── i18n/               # 다국어 번역 파일
 │   ├── types/              # TypeScript 타입 정의
 │   └── App.tsx             # 라우터 & 레이아웃
+├── docs/                   # 다국어 README
 ├── .env.example            # 환경변수 템플릿
 ├── vercel.json             # Vercel 배포 설정
 └── vite.config.ts          # Vite 설정 (프록시 포함)
@@ -142,8 +186,12 @@ anivoice/
 
 ## 더빙 워크플로우
 
-```
-영상 업로드 → 언어 설정 → AI 더빙 → 자막 편집 → 다운로드/공유
+```mermaid
+flowchart LR
+    A[영상 업로드] --> B[언어 설정]
+    B --> C[AI 더빙]
+    C --> D[자막 편집]
+    D --> E[다운로드 / 공유]
 ```
 
 1. **업로드** — MP4, MOV, WebM 파일을 Azure Blob Storage에 업로드
@@ -170,6 +218,11 @@ Vercel에 배포하려면:
 3. 자동 배포 완료
 
 `vercel.json`에 보안 헤더, SPA 라우팅, API 리라이트가 설정되어 있습니다.
+
+## 보안
+
+- 보안 취약점 보고: [`SECURITY.md`](./SECURITY.md)
+- 보안 감사 보고서: [`SECURITY-AUDIT.md`](./SECURITY-AUDIT.md)
 
 ## 기여하기
 

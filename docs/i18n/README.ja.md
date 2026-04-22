@@ -18,6 +18,49 @@ Path: ../../PROMPT.md
 
 [Perso.ai](https://developers.perso.ai) APIで動作します。
 
+## デモ
+
+[![AniVoice Demo](https://img.youtube.com/vi/0bYM_8Q8eD0/maxresdefault.jpg)](https://youtu.be/0bYM_8Q8eD0)
+
+## アーキテクチャ
+
+```mermaid
+graph TB
+    subgraph Client["クライアント (React SPA)"]
+        UI[UIコンポーネント]
+        Pages[ページルーター]
+        Stores[Zustandストア]
+        Services[APIクライアント]
+    end
+
+    subgraph Vercel["Vercel Serverless Functions"]
+        Proxy[Perso APIプロキシ]
+        AuthAPI[認証ミドルウェア]
+        ProjectsAPI[プロジェクトAPI]
+        LibraryAPI[ライブラリAPI]
+        CreditsAPI[クレジットAPI]
+    end
+
+    subgraph External["外部サービス"]
+        PersoAI["Perso.ai API\n(吹き替え・翻訳・リップシンク)"]
+        Firebase["Firebase Auth"]
+        Turso["Turso DB\n(libSQL)"]
+        Azure["Azure Blob\n(ファイルストレージ)"]
+    end
+
+    UI --> Pages --> Services
+    Pages --> Stores
+    Services -->|"/api/perso/*"| Proxy
+    Services -->|"/api/*"| AuthAPI
+    AuthAPI --> ProjectsAPI & LibraryAPI & CreditsAPI
+    Proxy -->|"XP-API-KEY注入"| PersoAI
+    AuthAPI -->|"トークン検証"| Firebase
+    ProjectsAPI & LibraryAPI & CreditsAPI --> Turso
+    PersoAI --> Azure
+```
+
+> 詳細なアーキテクチャドキュメントは [`ARCHITECTURE.md`](../../ARCHITECTURE.md) をご参照ください。
+
 ## 主な機能
 
 - **AI吹き替え** — 動画をアップロードすると、キャラクターの声のトーンを維持したまま多言語吹き替え
@@ -35,7 +78,7 @@ Path: ../../PROMPT.md
 
 | レイヤー | 技術 |
 |---------|------|
-| フロントエンド | React 19, TypeScript, Vite, Tailwind CSS 4 |
+| フロントエンド | React 19, TypeScript 6, Vite 8, Tailwind CSS 4 |
 | 状態管理 | Zustand |
 | ルーティング | React Router 7 |
 | 認証 | Firebase Authentication |
@@ -57,7 +100,7 @@ Path: ../../PROMPT.md
 ### インストール
 
 ```bash
-git clone https://github.com/your-username/anivoice.git
+git clone https://github.com/perso-devrel/anivoice.git
 cd anivoice
 npm install
 ```
@@ -135,6 +178,7 @@ anivoice/
 │   ├── i18n/               # 翻訳ファイル
 │   ├── types/              # TypeScript型定義
 │   └── App.tsx             # ルーター & レイアウト
+├── docs/                   # 多言語README
 ├── .env.example            # 環境変数テンプレート
 ├── vercel.json             # Vercelデプロイ設定
 └── vite.config.ts          # Vite設定（プロキシ含む）
@@ -142,8 +186,12 @@ anivoice/
 
 ## 吹き替えワークフロー
 
-```
-動画アップロード → 言語設定 → AI吹き替え → 字幕編集 → ダウンロード/共有
+```mermaid
+flowchart LR
+    A[動画アップロード] --> B[言語設定]
+    B --> C[AI吹き替え]
+    C --> D[字幕編集]
+    D --> E[ダウンロード / 共有]
 ```
 
 1. **アップロード** — MP4、MOV、WebMファイルをAzure Blob Storageにアップロード
@@ -170,6 +218,11 @@ Vercelにデプロイするには：
 3. 自動デプロイ完了
 
 セキュリティヘッダー、SPAルーティング、APIリライトは`vercel.json`で設定済みです。
+
+## セキュリティ
+
+- 脆弱性報告: [`SECURITY.md`](../../SECURITY.md)
+- セキュリティ監査レポート: [`SECURITY-AUDIT.md`](../../SECURITY-AUDIT.md)
 
 ## コントリビュート
 

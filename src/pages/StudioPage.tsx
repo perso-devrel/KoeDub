@@ -88,10 +88,8 @@ export default function StudioPage() {
     const sSeq = Number(spaceParam);
     if (isNaN(pSeq) || isNaN(sSeq)) return;
 
-    setProjectSeq(pSeq);
-    setSpaceSeq(sSeq);
-    setStep('result');
-    setLoadingProject(true);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- batch-init from URL params before async load
+    setProjectSeq(pSeq); setSpaceSeq(sSeq); setStep('result'); setLoadingProject(true);
 
     async function loadExistingProject() {
       try {

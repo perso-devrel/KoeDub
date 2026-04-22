@@ -1,6 +1,6 @@
 # 보안 감사 보고서 (Security Audit Report)
 
-> **최종 갱신:** 2026-04-16 (`@vercel/node@4` 업그레이드 반영)
+> **최종 갱신:** 2026-04-22
 > **검사 도구:** `npm audit` (GitHub Advisory DB), 수동 리뷰
 > **후속 자동 검사:** `.github/workflows/security-audit.yml` (매일 + PR 시 OSV-Scanner + npm audit)
 
@@ -10,24 +10,21 @@
 
 | 구분 | 취약점 수 |
 |------|-----------|
-| **프로덕션 런타임 번들 (`--omit=dev`)** | **0 건** ✅ |
-| 전체 (dev 포함) | 7 건 (High 3, Moderate 4) |
+| **프로덕션 런타임 번들 (`--omit=dev`)** | **0 건** |
+| 전체 (dev 포함) | 9 건 (High 6, Moderate 3) |
 | Critical | 0 건 |
 
 **결론:** 프로덕션 번들은 **클린(0건)**. 남은 취약점은 전부 `@vercel/node` devDependency 트리 내부 도구 체인에서 유래하며, 최종 빌드 산출물에는 포함되지 않습니다.
 
 ### 변경 이력
-- **2026-04-16 [이전]** 10 건 (High 6, Moderate 4) — `@vercel/node@3.x`
-- **2026-04-16 [현재]** 7 건 (High 3, Moderate 4) — `@vercel/node@^4.0.0` 업그레이드 + `npm audit fix` 적용 후
-
-### @vercel/node@5 검토 결과
-v5.7.7 설치 시 transitive `undici` 등의 영향으로 **취약점 수가 오히려 증가**했습니다. 현 시점 최적안은 **v4.0.0**입니다.
+- **2026-04-22 [현재]** 9 건 (High 6, Moderate 3) — `@vercel/node@5.7.12`
+- **2026-04-16** 7 건 (High 3, Moderate 4) — `@vercel/node@^4.0.0` 업그레이드 후
 
 ---
 
 ## 2. 프로덕션 취약점 (Runtime)
 
-`dependencies` 트리에서 감지된 취약점: **없음** ✅
+`dependencies` 트리에서 감지된 취약점: **없음**
 
 직접 번들링되는 런타임 의존성(React 19, axios, Firebase, `@libsql/client`, i18next, zustand, react-router-dom, tailwindcss, recharts)은 모두 최신 버전을 유지합니다.
 
@@ -35,17 +32,17 @@ v5.7.7 설치 시 transitive `undici` 등의 영향으로 **취약점 수가 오
 
 ## 3. 개발 전용 취약점 (devDependencies)
 
-아래 7 건은 `@vercel/node` 내부 빌드 도구 체인에서 유래하며, 프로덕션 번들/서버리스 함수 런타임에 **영향 없음**. CI 환경에서만 실행됩니다.
+아래 9건은 `@vercel/node` 내부 빌드 도구 체인에서 유래하며, 프로덕션 번들/서버리스 함수 런타임에 **영향 없음**. CI 환경에서만 실행됩니다.
 
-| 패키지 | 심각도 | Advisory | 비고 |
-|--------|--------|----------|------|
-| `undici` ≤ 6.23.0 | High | [GHSA-c76h-2ccp-4975](https://github.com/advisories/GHSA-c76h-2ccp-4975) 외 | `@vercel/node` 내부 fetch |
-| `tar` ≤ 7.5.10 | High | [GHSA-34x7-hfp2-rc4v](https://github.com/advisories/GHSA-34x7-hfp2-rc4v) | `@mapbox/node-pre-gyp` 의존 |
-| `@mapbox/node-pre-gyp` | High | via `tar` | 바이너리 설치 전용 |
-| `ajv` 7.x–8.17.1 | Moderate | [GHSA-2g4f-4pwh-qvx6](https://github.com/advisories/GHSA-2g4f-4pwh-qvx6) | `@vercel/static-config` |
-| `@vercel/static-config` | Moderate | via `ajv` | 빌드 설정 파서 |
-| `esbuild` ≤ 0.24.2 | Moderate | [GHSA-67mh-4wv8-2f99](https://github.com/advisories/GHSA-67mh-4wv8-2f99) | 개발 서버만 영향 |
-| (기타 transitive 1건) | - | - | - |
+| 패키지 | 심각도 | 비고 |
+|--------|--------|------|
+| `undici` <= 6.23.0 | High (7 CVE) | `@vercel/node` 내부 fetch: 요청 스머글링, CRLF 인젝션, 메모리 소비, 인증서 DoS 등 |
+| `path-to-regexp` 4.0.0-6.2.2 | High | 백트래킹 ReDoS |
+| `minimatch` 10.0.0-10.2.2 | High (3 CVE) | 와일드카드/GLOBSTAR/extglob ReDoS |
+| `ajv` 7.x-8.17.1 | Moderate | `$data` 옵션 사용 시 ReDoS |
+| `smol-toml` < 1.6.1 | Moderate | 대량 주석 TOML 문서 DoS |
+
+**해결 방법:** `npm audit fix --force`로 `@vercel/node@4.0.0`으로 다운그레이드 가능하나, breaking change. `@vercel/node` 업스트림 패치를 대기 중.
 
 ---
 
@@ -53,19 +50,32 @@ v5.7.7 설치 시 transitive `undici` 등의 영향으로 **취약점 수가 오
 
 | 패키지 | 버전 | 상태 |
 |--------|------|------|
-| `react` / `react-dom` | ^19.2.4 | ✅ 최신 |
-| `react-router-dom` | ^7.14.0 | ✅ 최신 |
-| `firebase` | ^12.11.0 | ✅ 최신 |
-| `@libsql/client` | ^0.17.2 | ✅ 최신 |
-| `axios` | ^1.14.0 | ✅ 최신 (follow-redirects 패치 포함) |
-| `i18next` / `react-i18next` | ^26 / ^17 | ✅ 최신 |
-| `recharts` | ^3.8.1 | ✅ 최신 |
-| `tailwindcss` | ^4.2.2 | ✅ 최신 |
-| `zustand` | ^5.0.12 | ✅ 최신 |
+| `react` / `react-dom` | ^19.2.5 | 최신 |
+| `react-router-dom` | ^7.14.1 | 최신 |
+| `firebase` | ^12.12.0 | 최신 |
+| `@libsql/client` | ^0.17.2 | 최신 |
+| `axios` | ^1.15.1 | 최신 |
+| `i18next` / `react-i18next` | ^26 / ^17 | 최신 |
+| `recharts` | ^3.8.1 | 최신 |
+| `tailwindcss` | ^4.2.2 | 최신 |
+| `zustand` | ^5.0.12 | 최신 |
 
 ---
 
-## 5. 자동화된 보안 통제
+## 5. 코드 보안 리뷰
+
+| 항목 | 결과 |
+|------|------|
+| `eval()` / `innerHTML` / `dangerouslySetInnerHTML` | 미사용 |
+| SQL Injection | 파라미터화된 쿼리 사용 (안전) |
+| API 키 노출 | 서버 사이드 프록시로 차단 |
+| 프록시 SSRF | 경로 허용 목록 적용 (`api/perso.ts`) |
+| 에러 정보 노출 | 내부 URL 미노출 (2026-04-22 수정) |
+| Mock 인증 폴백 | Firebase 미설정 시에만 활성화 |
+
+---
+
+## 6. 자동화된 보안 통제
 
 | 통제 | 파일 | 트리거 |
 |------|------|--------|
@@ -77,13 +87,6 @@ v5.7.7 설치 시 transitive `undici` 등의 영향으로 **취약점 수가 오
 | Secret scanning + push protection | GitHub 설정 | 실시간 |
 | Private vulnerability reporting | GitHub 설정 | 항상 |
 | Branch protection (`main`) | GitHub 설정 | PR 머지 시 |
-
----
-
-## 6. 남은 과제 (Open Items)
-
-- **`@vercel/node` 업스트림 추적** — v4에서 `undici`/`tar` 등을 최신으로 끌어올릴 때까지 dev-only 취약점이 남습니다. 다음 v4 minor 업데이트를 Dependabot이 자동 제안.
-- **프로덕션 게이트 유지** — CI의 `npm audit --audit-level=high --omit=dev`가 0건을 유지하도록 모니터링.
 
 ---
 

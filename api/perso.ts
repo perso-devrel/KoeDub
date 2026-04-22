@@ -51,7 +51,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const message = error instanceof Error ? error.message : String(error);
     return res.status(502).json({
       error: `Perso API proxy request failed: ${message}`,
-      target: targetUrl,
     });
   }
 }
