@@ -15,16 +15,16 @@
     "ralph:summary": "bash .ralph/summary.sh"
   },
   "dependencies": {
-    "@libsql/client": "^0.17.2",
+    "@libsql/client": "^0.17.3",
     "@phosphor-icons/react": "^2.1.10",
-    "@tailwindcss/vite": "^4.2.2",
-    "axios": "^1.15.1",
-    "firebase": "^12.12.0",
-    "i18next": "^26.0.6",
+    "@tailwindcss/vite": "^4.2.4",
+    "axios": "^1.15.2",
+    "firebase": "^12.12.1",
+    "i18next": "^26.0.8",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-i18next": "^17.0.4",
-    "react-router-dom": "^7.14.1",
+    "react-router-dom": "^7.14.2",
     "recharts": "^3.8.1",
     "tailwindcss": "^4.2.2",
     "zustand": "^5.0.12"
@@ -41,8 +41,8 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.5.0",
     "typescript": "~6.0.3",
-    "typescript-eslint": "^8.58.2",
-    "vite": "^8.0.1",
-    "vitest": "^4.1.4"
+    "typescript-eslint": "^8.59.0",
+    "vite": "^8.0.10",
+    "vitest": "^4.1.5"
   }
 }
