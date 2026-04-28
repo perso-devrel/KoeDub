@@ -28,6 +28,7 @@ import {
   computeDeductSeconds,
   buildShareUrl,
   toggleArrayItem,
+  formatTimecode,
   PROGRESS_GET_SPACE,
   PROGRESS_UPLOAD_START,
   PROGRESS_UPLOAD_DONE,
@@ -51,6 +52,7 @@ export default function StudioPage() {
 
   const [step, setStep] = useState<Step>('upload');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [videoDuration, setVideoDuration] = useState(0);
   const [sourceLanguage, setSourceLanguage] = useState('auto');
   const [targetLanguages, setTargetLanguages] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -159,6 +161,15 @@ export default function StudioPage() {
     setSelectedFile(file);
     setError(null);
     setStep('settings');
+
+    const url = URL.createObjectURL(file);
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.onloadedmetadata = () => {
+      setVideoDuration(video.duration);
+      URL.revokeObjectURL(url);
+    };
+    video.src = url;
   }
 
   const handleStartDubbing = useCallback(async () => {
@@ -398,6 +409,7 @@ export default function StudioPage() {
   function handleResetProject() {
     setStep('upload');
     setSelectedFile(null);
+    setVideoDuration(0);
     setTargetLanguages([]);
     setProjectSeq(null);
     setSpaceSeq(null);
@@ -417,7 +429,7 @@ export default function StudioPage() {
         <span className="font-mono text-[11px] uppercase tracking-widest text-bone/40">
           {selectedFile ? selectedFile.name : t('studio.uploadTitle')}
         </span>
-        <span className="font-mono text-[11px] tracking-wider text-wire">00:00:00:00</span>
+        <span className="font-mono text-[11px] tracking-wider text-wire">{formatTimecode(videoDuration)}</span>
       </div>
       <div className="max-w-6xl mx-auto px-6 md:px-12 py-6 sm:py-8">
         <StepIndicator currentStep={step} labels={stepLabels} />
