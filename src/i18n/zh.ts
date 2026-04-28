@@ -165,6 +165,7 @@ export default {
     clipboardError: '无法将链接复制到剪贴板',
     insufficientCredits: '点数不足。所需: {{required}}分钟，余额: {{balance}}分钟。请充值点数。',
     goToPricing: '充值点数',
+    testRequestNotice: '如需测试您的视频，请联系 devrel.365@gmail.com！由于成本原因，请提供1~3分钟以内的视频。',
   },
   library: {
     title: '配音档案馆',
@@ -249,6 +250,7 @@ export default {
     dubbingTimeLabel: '{{amount}}配音时长',
     creditRecharge: '充值{{amount}}',
     remainingTime: '当前剩余时间：',
+    paymentNotAvailable: '目前暂不支持支付功能，敬请期待。',
   },
   onboarding: {
     welcome: '欢迎来到 AniVoice！',

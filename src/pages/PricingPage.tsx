@@ -52,6 +52,9 @@ export default function PricingPage() {
       navigate('/login');
       return;
     }
+    showToast(t('pricing.paymentNotAvailable'), 'info');
+    return;
+
     const label = t(pkg.labelKey);
     setSelectedSeconds(pkg.seconds);
     setModal({

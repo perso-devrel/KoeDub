@@ -165,6 +165,7 @@ export default {
     clipboardError: '링크를 클립보드에 복사하지 못했습니다',
     insufficientCredits: '크레딧이 부족합니다. 필요: {{required}}분, 잔액: {{balance}}분. 크레딧을 충전해 주세요.',
     goToPricing: '크레딧 충전하기',
+    testRequestNotice: '테스트를 원하는 영상이 있다면 devrel.365@gmail.com으로 연락주세요! 비용 관련 문제로 1~3분 이내의 영상으로 부탁드립니다.',
   },
   library: {
     title: '더빙 아카이브',
@@ -249,6 +250,7 @@ export default {
     dubbingTimeLabel: '{{amount}} 더빙 시간',
     creditRecharge: '{{amount}} 충전',
     remainingTime: '현재 잔여 시간:',
+    paymentNotAvailable: '현재 결제 기능을 지원하지 않습니다. 추후 지원 예정입니다.',
   },
   onboarding: {
     welcome: 'AniVoice에 오신 것을 환영합니다!',

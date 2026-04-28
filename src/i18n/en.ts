@@ -165,6 +165,7 @@ export default {
     clipboardError: 'Failed to copy link to clipboard',
     insufficientCredits: 'Insufficient credits. Required: {{required}} min, Balance: {{balance}} min. Please purchase more credits.',
     goToPricing: 'Buy credits',
+    testRequestNotice: 'Want to test with your own video? Contact devrel.365@gmail.com! Due to cost constraints, please keep videos under 1–3 minutes.',
   },
   library: {
     title: 'Dubbing Archive',
@@ -249,6 +250,7 @@ export default {
     dubbingTimeLabel: '{{amount}} dubbing time',
     creditRecharge: '{{amount}} recharge',
     remainingTime: 'Remaining time:',
+    paymentNotAvailable: 'Payment is not available at this time. Coming soon.',
   },
   onboarding: {
     welcome: 'Welcome to AniVoice!',
