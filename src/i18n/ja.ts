@@ -165,6 +165,7 @@ export default {
     clipboardError: 'リンクをクリップボードにコピーできませんでした',
     insufficientCredits: 'クレジットが不足しています。必要: {{required}}分、残高: {{balance}}分。クレジットを追加購入してください。',
     goToPricing: 'クレジット購入',
+    testRequestNotice: 'テスト用の動画がある方は devrel.365@gmail.com までご連絡ください！コストの都合上、1〜3分以内の動画でお願いします。',
   },
   library: {
     title: '吹き替えアーカイブ',
@@ -249,6 +250,7 @@ export default {
     dubbingTimeLabel: '{{amount}}吹き替え時間',
     creditRecharge: '{{amount}}チャージ',
     remainingTime: '残り時間：',
+    paymentNotAvailable: '現在、決済機能はご利用いただけません。近日対応予定です。',
   },
   onboarding: {
     welcome: 'AniVoiceへようこそ！',

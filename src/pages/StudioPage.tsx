@@ -40,6 +40,7 @@ import { StepIndicator, type Step } from '../components/StepIndicator';
 import { SettingsStep } from '../components/SettingsStep';
 import { UploadStep } from '../components/UploadStep';
 import { ResultStep } from '../components/ResultStep';
+import { showToast } from '../stores/toastStore';
 
 export default function StudioPage() {
   const { t } = useTranslation();
@@ -158,6 +159,7 @@ export default function StudioPage() {
     setSelectedFile(file);
     setError(null);
     setStep('settings');
+    showToast(t('studio.testRequestNotice'), 'info');
   }
 
   const handleStartDubbing = useCallback(async () => {
