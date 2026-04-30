@@ -26,7 +26,6 @@ import {
   getDownloadUrl,
   downloadSrt,
   computeDubbingProgress,
-  computeDeductSeconds,
   buildShareUrl,
   toggleArrayItem,
   formatTimecode,
@@ -226,14 +225,8 @@ export default function StudioPage() {
       setProgress(PROGRESS_UPLOAD_DONE);
       uploadedFileRef.current = uploadedFile;
 
-      const requiredSeconds = computeDeductSeconds(uploadedFile.durationMs, targetLanguages.length);
-      const currentCredits = useAuthStore.getState().user?.creditSeconds ?? 0;
-      if (currentCredits < requiredSeconds) {
-        showToast(t('studio.creditShortageNotice'), 'error');
-        setIsProcessing(false);
-        setStep('settings');
-        return;
-      }
+      // 사용자가 직접 입력한 Perso API 키로 과금되므로 KoeDub 내부 크레딧
+      // 잔액은 더빙 차단 조건이 아니다. 잔액이 0이어도 진행 가능.
 
       setProgress(PROGRESS_QUEUE_ENSURED);
       await ensureSpaceQueue(space.spaceSeq);
@@ -266,8 +259,13 @@ export default function StudioPage() {
       });
       setDbProjectId(dbProject.id);
 
-      const deductResult = await deductCredits(dbProject.id, uploadedFile.durationMs, targetLanguages.length);
-      useAuthStore.getState().setCreditSeconds(deductResult.remainingSeconds);
+      try {
+        const deductResult = await deductCredits(dbProject.id, uploadedFile.durationMs, targetLanguages.length);
+        useAuthStore.getState().setCreditSeconds(deductResult.remainingSeconds);
+      } catch {
+        // 잔액 부족 등으로 차감이 실패해도 더빙 흐름은 진행한다.
+        // 사용자가 본인 Perso 키로 직접 과금하므로 KoeDub 크레딧은 통계용.
+      }
 
       await pollProgress(primaryProjectSeq, space.spaceSeq, (p: PersoProgress) => {
         setProgress(computeDubbingProgress(p.progress));
