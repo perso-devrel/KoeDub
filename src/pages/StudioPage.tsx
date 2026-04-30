@@ -163,8 +163,15 @@ export default function StudioPage() {
     setStep('settings');
 
     const url = URL.createObjectURL(file);
-    if (!url.startsWith('blob:')) {
-      // URL.createObjectURL must return a blob: URL; bail out if not.
+    let parsed: URL;
+    try {
+      parsed = new URL(url);
+    } catch {
+      URL.revokeObjectURL(url);
+      return;
+    }
+    if (parsed.protocol !== 'blob:') {
+      URL.revokeObjectURL(url);
       return;
     }
     const video = document.createElement('video');
@@ -173,7 +180,7 @@ export default function StudioPage() {
       setVideoDuration(video.duration);
       URL.revokeObjectURL(url);
     };
-    video.src = url;
+    video.src = parsed.href;
   }
 
   const handleStartDubbing = useCallback(async () => {
