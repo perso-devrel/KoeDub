@@ -1,9 +1,21 @@
 import type { Analytics } from 'firebase/analytics';
 
+const MEASUREMENT_ID = import.meta.env.VITE_FIREBASE_MEASUREMENT_ID;
+const FIREBASE_API_KEY = import.meta.env.VITE_FIREBASE_API_KEY;
 const ENABLED =
-  !!import.meta.env.VITE_FIREBASE_API_KEY &&
-  import.meta.env.VITE_FIREBASE_API_KEY !== 'your_firebase_key' &&
-  !!import.meta.env.VITE_FIREBASE_MEASUREMENT_ID;
+  !!FIREBASE_API_KEY &&
+  FIREBASE_API_KEY !== 'your_firebase_key' &&
+  !!MEASUREMENT_ID;
+
+if (typeof window !== 'undefined') {
+  // 진단용 로그: 배포된 사이트 콘솔에서 한 번만 노출되어 어떤 단계에서
+  // 막히는지 파악할 수 있도록 한다. 운영 안정화 후 제거 가능.
+  console.info('[KoeDub Analytics] init', {
+    enabled: ENABLED,
+    hasApiKey: !!FIREBASE_API_KEY,
+    measurementId: MEASUREMENT_ID || '(missing)',
+  });
+}
 
 let analyticsPromise: Promise<Analytics | null> | null = null;
 
@@ -16,15 +28,21 @@ async function getAnalytics(): Promise<Analytics | null> {
       const firebaseApp = await import('firebase/app');
       const analyticsMod = await import('firebase/analytics');
       const supported = await analyticsMod.isSupported();
-      if (!supported) return null;
+      if (!supported) {
+        console.warn('[KoeDub Analytics] firebase/analytics isSupported() returned false');
+        return null;
+      }
       const app = firebaseApp.getApps()[0] ?? firebaseApp.initializeApp({
-        apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+        apiKey: FIREBASE_API_KEY,
         authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
         projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-        measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+        measurementId: MEASUREMENT_ID,
       });
-      return analyticsMod.getAnalytics(app);
-    } catch {
+      const a = analyticsMod.getAnalytics(app);
+      console.info('[KoeDub Analytics] ready');
+      return a;
+    } catch (err) {
+      console.warn('[KoeDub Analytics] init failed:', err);
       return null;
     }
   })();
