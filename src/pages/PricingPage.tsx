@@ -6,6 +6,7 @@ import { useAuthStore } from '../stores/authStore';
 import { purchaseCredits } from '../services/koedubApi';
 import { formatCreditTime } from '../utils/format';
 import { showToast } from '../stores/toastStore';
+import { trackEvent } from '../services/analytics';
 import { ClockIcon } from '../components/icons';
 import { CheckoutModal, type CardForm } from '../components/CheckoutModal';
 import {
@@ -48,6 +49,11 @@ export default function PricingPage() {
   };
 
   const handleBuyTime = (pkg: typeof TIME_PACKAGE_CONFIGS[number]) => {
+    trackEvent('checkout_attempt', {
+      package_seconds: pkg.seconds,
+      package_price_usd: pkg.priceNum,
+      logged_in: !!user,
+    });
     if (!user) {
       navigate('/login');
       return;

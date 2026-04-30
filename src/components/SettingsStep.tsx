@@ -1,6 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import { FileIcon, CheckIcon } from './icons';
 import { LANGUAGE_KEYS } from '../constants';
+import { trackEvent } from '../services/analytics';
+
+const PERSO_API_KEYS_URL = 'https://developers.perso.ai/api-keys';
 
 const STUDIO_LANGUAGES = ['auto', ...LANGUAGE_KEYS] as const;
 
@@ -94,6 +97,18 @@ export function SettingsStep({
           spellCheck={false}
           className="w-full bg-void border-2 border-bone/30 px-4 py-2.5 text-sm text-bone placeholder-bone/30 focus:outline-none focus:border-lucy transition-colors font-mono"
         />
+        <a
+          href={PERSO_API_KEYS_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => trackEvent('perso_api_keys_link_click', { source: 'studio_settings' })}
+          className="inline-flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-widest text-lucy hover:text-bone transition-colors group"
+        >
+          <span className="border-b border-lucy/40 group-hover:border-bone pb-px">
+            {t('studio.apiKeyIssueLink')}
+          </span>
+          <span aria-hidden="true">↗</span>
+        </a>
         <p className="text-[11px] text-bone/40 leading-relaxed">
           {t('studio.apiKeyHint')}
         </p>
