@@ -6,6 +6,7 @@ import { LoadingSpinner } from './components/icons';
 import { useAuthStore } from './stores/authStore';
 import { useUIStore } from './stores/uiStore';
 import { initAuthListener } from './services/firebase';
+import { trackPageView, setAnalyticsUserId } from './services/analytics';
 
 const LandingPage = lazy(() => import('./pages/LandingPage'));
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
@@ -49,6 +50,21 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function AnalyticsTracker() {
+  const location = useLocation();
+  const userId = useAuthStore((s) => s.user?.id ?? null);
+
+  useEffect(() => {
+    trackPageView(location.pathname + location.search);
+  }, [location.pathname, location.search]);
+
+  useEffect(() => {
+    setAnalyticsUserId(userId);
+  }, [userId]);
+
+  return null;
+}
+
 export default function App() {
   const language = useUIStore((s) => s.language);
 
@@ -69,6 +85,7 @@ export default function App() {
         </div>
       }
     >
+    <AnalyticsTracker />
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<LandingPage />} />

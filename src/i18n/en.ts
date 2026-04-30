@@ -160,6 +160,7 @@ export default {
     apiKeyPlaceholder: 'Paste your XP-API-KEY',
     apiKeyHint: 'The key is never stored on our server — it is only used for this dubbing request.',
     apiKeyRequired: 'Please enter your Perso API key',
+    apiKeyIssueLink: 'Get an API key on Perso',
     languagesSelected: '{{count}} language(s) selected',
     loadingProject: 'Loading project...',
     remainingTime: '~{{minutes}}min remaining',

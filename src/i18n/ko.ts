@@ -160,6 +160,7 @@ export default {
     apiKeyPlaceholder: 'XP-API-KEY 값을 붙여넣기',
     apiKeyHint: '입력한 키는 서버에 저장되지 않으며, 이번 더빙 요청에만 사용됩니다.',
     apiKeyRequired: 'Perso API 키를 입력해 주세요',
+    apiKeyIssueLink: 'Perso에서 API 키 발급받기',
     languagesSelected: '{{count}}개 언어 선택됨',
     loadingProject: '프로젝트를 불러오는 중...',
     remainingTime: '약 {{minutes}}분 남음',

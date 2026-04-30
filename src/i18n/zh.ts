@@ -160,6 +160,7 @@ export default {
     apiKeyPlaceholder: '粘贴 XP-API-KEY',
     apiKeyHint: '您输入的密钥不会保存在服务器，仅用于本次配音请求。',
     apiKeyRequired: '请输入 Perso API 密钥',
+    apiKeyIssueLink: '在 Perso 申请 API 密钥',
     languagesSelected: '已选择{{count}}种语言',
     loadingProject: '加载项目中...',
     remainingTime: '约剩余{{minutes}}分钟',

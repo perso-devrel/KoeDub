@@ -43,6 +43,7 @@ import { SettingsStep } from '../components/SettingsStep';
 import { UploadStep } from '../components/UploadStep';
 import { ResultStep } from '../components/ResultStep';
 import { showToast } from '../stores/toastStore';
+import { trackEvent } from '../services/analytics';
 
 export default function StudioPage() {
   const { t } = useTranslation();
@@ -189,6 +190,11 @@ export default function StudioPage() {
       return;
     }
     setPersoApiKey(apiKey);
+    trackEvent('dubbing_start', {
+      source_language: sourceLanguage,
+      target_count: targetLanguages.length,
+      target_languages: targetLanguages.join(','),
+    });
 
     setIsProcessing(true);
     setError(null);
@@ -352,6 +358,7 @@ export default function StudioPage() {
   }
 
   function handleDownload(type: 'video' | 'subtitle' | 'audio' | 'zip') {
+    trackEvent('download_click', { download_type: type });
     if (type === 'subtitle') {
       if (sentences.length > 0) {
         const name = selectedFile?.name?.replace(/\.[^.]+$/, '') || 'subtitle';

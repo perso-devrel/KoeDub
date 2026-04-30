@@ -160,6 +160,7 @@ export default {
     apiKeyPlaceholder: 'XP-API-KEYを貼り付け',
     apiKeyHint: '入力されたキーはサーバーに保存されず、今回のダビングリクエストにのみ使用されます。',
     apiKeyRequired: 'Perso APIキーを入力してください',
+    apiKeyIssueLink: 'PersoでAPIキーを発行する',
     languagesSelected: '{{count}}言語が選択されています',
     loadingProject: 'プロジェクトを読み込み中...',
     remainingTime: '約{{minutes}}分残り',
